@@ -96,6 +96,8 @@ namespace SkillDrasil
         };
     }
 
+    public enum Block { None, Maxed, NeedSpent, BranchFull, NoPoints }
+
     public sealed class TreeState
     {
         public const string Key = "SkillDrasil";
@@ -138,21 +140,28 @@ namespace SkillDrasil
             return gained;
         }
 
-        // null when the next rank can be bought, otherwise the reason it can't.
-        public string CanSpend(string id)
+        // Max points one branch can hold, 0 = unlimited. Set from server-synced config.
+        public static int BranchCap;
+
+        public Block CanSpend(string id) => CanSpend(id, out _);
+
+        // Block.None when the next rank can be bought. `need` = points required in the branch for NeedSpent.
+        public Block CanSpend(string id, out int need)
         {
             var n = TreeDef.ById[id];
             int rank = Rank(id);
-            if (rank >= n.MaxRank) return "Maxed.";
-            int need = n.RequiredSpent(rank + 1);
-            if (Spent(n.Branch) < need) return $"Needs {need} points spent in {TreeDef.BranchNames[(int)n.Branch]}.";
-            if (BranchAvailable(n.Branch) == 0 && FreeAvailable <= 0) return "No points available.";
-            return null;
+            need = n.RequiredSpent(rank + 1);
+            if (rank >= n.MaxRank) return Block.Maxed;
+            int spent = Spent(n.Branch);
+            if (spent < need) return Block.NeedSpent;
+            if (BranchCap > 0 && spent >= BranchCap) return Block.BranchFull;
+            if (BranchAvailable(n.Branch) == 0 && FreeAvailable <= 0) return Block.NoPoints;
+            return Block.None;
         }
 
         public bool Spend(string id)
         {
-            if (CanSpend(id) != null) return false;
+            if (CanSpend(id) != Block.None) return false;
             Ranks[id] = Rank(id) + 1;
             return true;
         }

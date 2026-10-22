@@ -19,14 +19,14 @@ static class Program
 
         // Gating: mastery rank 2 needs 2 points spent in the branch.
         Check(s.Spend("swords"), "swords rank 1");
-        Check(s.CanSpend("swords") != null, "swords rank 2 gated");
+        Check(s.CanSpend("swords", out int need) == Block.NeedSpent && need == 2, "swords rank 2 gated");
         Check(s.Spend("axes"), "axes rank 1");
-        Check(s.CanSpend("swords") == "No points available.", "gate passed, out of points");
+        Check(s.CanSpend("swords") == Block.NoPoints, "gate passed, out of points");
 
         // Free (milestone) points cover spending beyond branch points.
         Check(s.Claim("defeated_eikthyr") && !s.Claim("defeated_eikthyr"), "milestone claimed once");
         Check(s.Spend("swords") && s.FreeAvailable == 0, "free point spent");
-        Check(s.CanSpend("shieldwall") == "No points available.", "perk tier 1 unlocked at 3 spent");
+        Check(s.CanSpend("shieldwall") == Block.NoPoints, "perk tier 1 unlocked at 3 spent");
 
         // Round trip.
         var back = TreeState.Parse(s.Serialize());
@@ -65,6 +65,19 @@ static class Program
             foreach (var n in TreeDef.Nodes) progress |= all.Spend(n.Id);
         }
         Check(TreeDef.Nodes.All(n => all.Rank(n.Id) == n.MaxRank), "all nodes reachable");
+
+        // Branch cap: spending stops at the cap, and every branch can still reach its tier 3 perk.
+        TreeState.BranchCap = 20;
+        var capped = new TreeState { FreeEarned = 1000 };
+        foreach (var n in TreeDef.Nodes.Where(n => !n.IsMastery)) Check(n.RequiredSpent(1) < TreeState.BranchCap, "perk reachable under cap");
+        for (bool progress = true; progress;)
+        {
+            progress = false;
+            foreach (var n in TreeDef.Nodes) progress |= capped.Spend(n.Id);
+        }
+        Check(capped.Spent(Branch.Warrior) == 20 && capped.CanSpend("swords") == Block.BranchFull, "warrior capped at 20");
+        Check(capped.Spent(Branch.Seidr) == 13, "small branch unaffected by cap");
+        TreeState.BranchCap = 0;
 
         // Update check version compare.
         Check(VersionUtil.IsNewer("v1.2.0", "1.1.9"), "newer");

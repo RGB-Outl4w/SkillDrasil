@@ -23,8 +23,8 @@ namespace SkillDrasil
 
             severed = ScriptableObject.CreateInstance<StatusEffect>();
             severed.name = "SkillDrasil_Severed";
-            severed.m_name = "Severed Roots";
-            severed.m_tooltip = "Masteries count one rank lower. Tier 3 perks are inactive.";
+            severed.m_name = "$sd_se_severed";
+            severed.m_tooltip = "$sd_se_severed_tip";
 
             forget = ScriptableObject.CreateInstance<SE_Forget>();
             forget.name = "SkillDrasil_Forget";
@@ -40,13 +40,14 @@ namespace SkillDrasil
         static void AddRune()
         {
             PrefabManager.OnVanillaPrefabsAvailable -= AddRune;
-            severed.m_icon = PrefabManager.Cache.GetPrefab<StatusEffect>("SoftDeath")?.m_icon;
+            severed.m_icon = Icons.Get("se_severed");
 
             var cfg = new ItemConfig
             {
-                Name = "Rune of Forgetting",
-                Description = "Consume to refund every point spent in your SkillDrasil tree.",
+                Name = "$sd_item_rune",
+                Description = "$sd_item_rune_desc",
                 CraftingStation = CraftingStations.Workbench,
+                Icons = new[] { Icons.Get("item_rune") },
             };
             cfg.AddRequirement("Stone", 10);
             cfg.AddRequirement("Resin", 10);
@@ -127,7 +128,7 @@ namespace SkillDrasil
             base.Setup(character);
             if (character != Player.m_localPlayer) return;
             Tree.Local?.Respec();
-            character.Message(MessageHud.MessageType.Center, "Your roots are unbound. All points refunded.");
+            character.Message(MessageHud.MessageType.Center, L.T("msg_respec"));
         }
     }
 

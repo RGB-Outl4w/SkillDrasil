@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <Compile Remove="tests/**" />
+    <EmbeddedResource Include="assets/atlas.png" LogicalName="SkillDrasil.atlas.png" />
+    <EmbeddedResource Include="assets/atlas.txt" LogicalName="SkillDrasil.atlas.txt" />
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
   </ItemGroup>
 
@@ -21,6 +23,7 @@
     <Reference Include="assembly_utils" HintPath="$(Managed)\assembly_utils.dll" Publicize="true" Private="false" />
     <Reference Include="assembly_guiutils" HintPath="$(Managed)\assembly_guiutils.dll" Private="false" />
     <Reference Include="$(Managed)\UnityEngine*.dll" Private="false" />
+    <Reference Include="netstandard" HintPath="$(Managed)\netstandard.dll" Private="false" />
     <Reference Include="BepInEx" HintPath="$(BepInExDir)\core\BepInEx.dll" Private="false" />
     <Reference Include="0Harmony" HintPath="$(BepInExDir)\core\0Harmony.dll" Private="false" />
     <Reference Include="Jotunn" HintPath="$(BepInExDir)\plugins\Jotunn\Jotunn.dll" Private="false" />

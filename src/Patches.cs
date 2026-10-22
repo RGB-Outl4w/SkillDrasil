@@ -72,7 +72,7 @@ namespace SkillDrasil
             }
             if (migratedPoints > 0)
             {
-                p.Message(MessageHud.MessageType.Center, $"SkillDrasil: {migratedPoints} points granted from your old skills. Press {Plugin.OpenKey.Value}.");
+                p.Message(MessageHud.MessageType.Center, L.T("msg_migrated", migratedPoints, Plugin.OpenKey.Value));
                 migratedPoints = 0;
             }
         }
@@ -90,7 +90,7 @@ namespace SkillDrasil
                 .Concat(p.m_knownBiome.Where(TreeDef.MilestoneBiomes.Contains))
                 .Count(s.Claim);
             if (claimed > 0)
-                p.Message(MessageHud.MessageType.TopLeft, $"Milestone reached: +{claimed} free point{(claimed > 1 ? "s" : "")}");
+                p.Message(MessageHud.MessageType.TopLeft, L.T("msg_milestone", claimed));
         }
     }
 
@@ -141,7 +141,7 @@ namespace SkillDrasil
                 var p = __instance.m_player;
                 p.OnSkillLevelup(skillType, 0f);
                 p.Message(MessageHud.MessageType.TopLeft,
-                    $"{TreeDef.BranchNames[(int)n.Branch]} point earned ({s.BranchAvailable(n.Branch)} unspent)", 0, def?.m_icon);
+                    L.T("msg_point", L.Branch(n.Branch), s.BranchAvailable(n.Branch)), 0, def?.m_icon);
             }
             return false;
         }
@@ -154,7 +154,7 @@ namespace SkillDrasil
             if (s == null) return true;
             s.LoseXp(__instance.m_DeathLowerFactor * Game.m_skillReductionRate);
             Tree.PendingSevered = true;
-            __instance.m_player.Message(MessageHud.MessageType.TopLeft, "Your roots are severed: branch XP lost");
+            __instance.m_player.Message(MessageHud.MessageType.TopLeft, L.T("msg_severed"));
             return false;
         }
 
@@ -177,7 +177,7 @@ namespace SkillDrasil
                 return true;
             }
             s.Wipe();
-            __instance.m_player.Message(MessageHud.MessageType.TopLeft, "Your tree withers: all branch points lost");
+            __instance.m_player.Message(MessageHud.MessageType.TopLeft, L.T("msg_wither"));
             return false;
         }
 

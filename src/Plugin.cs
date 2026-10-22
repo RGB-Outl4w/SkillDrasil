@@ -25,6 +25,7 @@ namespace SkillDrasil
         const string ReleasesPage = "https://github.com/RGB-Outl4w/SkillDrasil/releases/latest";
 
         public static ConfigEntry<float> XpBase, XpGrowth, SeveredSeconds;
+        static ConfigEntry<int> branchCap;
         public static ConfigEntry<KeyCode> OpenKey;
         static ConfigEntry<bool> checkForUpdates;
         static string latestRelease;
@@ -37,9 +38,13 @@ namespace SkillDrasil
             XpBase = Config.BindConfig("Balance", "XpPerPointBase", 60f, "Branch XP needed for the first point.", synced: true);
             XpGrowth = Config.BindConfig("Balance", "XpPerPointGrowth", 0.25f, "Each earned point makes the next one cost this much more (fraction of base).", synced: true);
             SeveredSeconds = Config.BindConfig("Balance", "SeveredRootsSeconds", 600f, "Duration of the Severed Roots debuff after death.", synced: true);
+            branchCap = Config.BindConfig("Balance", "MaxPointsPerBranch", 20, "Most points one branch can hold, so nobody maxes everything. 0 = no limit.", synced: true);
+            TreeState.BranchCap = branchCap.Value;
+            branchCap.SettingChanged += (_, __) => TreeState.BranchCap = branchCap.Value;
             OpenKey = Config.BindConfig("Client", "OpenTreeKey", KeyCode.K, "Key that opens the skill tree.", synced: false);
             checkForUpdates = Config.BindConfig("Client", "CheckForUpdates", true, "Check GitHub for a newer release on the main menu.", synced: false);
 
+            L.Register();
             Perks.Register();
             CommandManager.Instance.AddConsoleCommand(new PointsCommand());
             new Harmony(Guid).PatchAll();
@@ -76,7 +81,7 @@ namespace SkillDrasil
         static void ShowUpdateNotice()
         {
             if (latestRelease == null || !FejdStartup.instance || !GUIManager.CustomGUIFront) return;
-            var go = GUIManager.Instance.CreateButton($"{ModName} {latestRelease} available - click to open",
+            var go = GUIManager.Instance.CreateButton(L.T("update", latestRelease),
                 GUIManager.CustomGUIFront.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), 480f, 36f);
             go.GetComponent<Button>().onClick.AddListener(() =>
             {
