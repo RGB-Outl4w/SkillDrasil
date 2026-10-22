@@ -163,4 +163,10 @@ if __name__ == '__main__':
     for name, body in ICONS.items():
         with io.open(os.path.join(out, name + '.svg'), 'w', encoding='utf-8', newline='\n') as f:
             f.write(HEAD + body + '\n</svg>\n')
+    # Website copies: same art, gold baked in (the game tints at runtime, the page can't tint an <img>).
+    web = os.path.join(os.path.dirname(__file__), '..', 'docs', 'icons')
+    os.makedirs(web, exist_ok=True)
+    for name, body in ICONS.items():
+        with io.open(os.path.join(web, name + '.svg'), 'w', encoding='utf-8', newline='\n') as f:
+            f.write((HEAD + body + '\n</svg>\n').replace('#fff', '#f2b24a'))
     print(len(ICONS), 'svgs')

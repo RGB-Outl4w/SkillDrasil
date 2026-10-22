@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillDrasil – древо навыков для Valheim</title>
+<meta name="description" content="SkillDrasil заменяет систему навыков Valheim древом из пяти ветвей: получайте очки, играя, выбирайте мастерство и перки и не теряйте свой выбор после смерти.">
+<meta property="og:title" content="SkillDrasil – древо навыков для Valheim">
+<meta property="og:description" content="Пять ветвей, 24 мастерства, 15 перков. Ваши деяния питают корни, ваш выбор растит ветви.">
+<link rel="icon" href="../icons/rune.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="en" href="../">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@600;800&family=Alegreya:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Runic&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="#">SkillDrasil</a>
+    <nav>
+      <span class="links"><a href="#tree">Древо</a></span>
+      <span class="links"><a href="#how">Как это работает</a></span>
+      <span class="links"><a href="#install">Установка</a></span>
+      <a href="https://github.com/RGB-Outl4w/SkillDrasil">GitHub</a>
+      <span class="lang"><a href="../" onclick="try{localStorage.setItem('sd-lang','en')}catch(e){}">EN</a><a href="./" aria-current="page" onclick="try{localStorage.setItem('sd-lang','ru')}catch(e){}">RU</a></span>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="runes" aria-hidden="true">ᛋᚲᛁᛚᛚᛞᚱᚨᛋᛁᛚ</div>
+    <h1>SkillDrasil</h1>
+    <p class="tagline">Древо навыков для Valheim. Ваши деяния питают корни. Ваш выбор растит ветви.</p>
+    <div class="buttons">
+      <a class="btn primary" href="https://github.com/RGB-Outl4w/SkillDrasil/releases/latest">Скачать последнюю версию</a>
+      <a class="btn" href="#tree">Изучить древо</a>
+    </div>
+    <p class="meta">Valheim 1.0 · BepInEx + Jotunn · Русский и English · Можно добавить в существующее сохранение и удалить без вреда</p>
+  </section>
+
+  <section class="intro">
+    <div class="versus">
+      <div class="panel old">
+        <h3>Обычные навыки</h3>
+        <ul>
+          <li>Повторяете действие — навык растёт.</li>
+          <li>Умираете — теряете уровни во всём.</li>
+          <li>Выбора нет: все викинги в итоге одинаковые.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>SkillDrasil</h3>
+        <ul>
+          <li>Действия наполняют пять ветвей, полная шкала даёт очко.</li>
+          <li>Очки вы сами тратите на мастерство и перки.</li>
+          <li>Смерть отнимает прогресс, но не ваш выбор.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="tree">
+    <div class="runes" aria-hidden="true">ᚢᚱᛞ ᚢᛖᚱᚦᚨᚾᛞᛁ ᛋᚲᚢᛚᛞ</div>
+    <h2 style="text-align:center">Мировое древо</h2>
+    <p class="intro">Пять ветвей. Мастерство — это корни, перки — крона, а ствол растёт с каждым очком, потраченным в ветви.</p>
+    <div class="panel" data-explorer></div>
+  </section>
+
+
+  <section id="how">
+    <h2>Как это работает</h2>
+    <div class="grid">
+      <div class="feature"><img src="../icons/woodcutting.svg" alt=""><h3>Опыт</h3><p>Каждый удар, выстрел, заплыв и сваренный обед дают опыт ветви этого навыка. Полная шкала приносит очко ветви, которое тратится только в ней.</p></div>
+      <div class="feature"><img src="../icons/swords.svg" alt=""><h3>Мастерство</h3><p>У каждого обычного навыка 5 рангов по 20 уровней, поэтому все родные эффекты навыков Valheim работают. Бонусы снаряжения и медовухи складываются сверху.</p></div>
+      <div class="feature"><img src="../icons/riposte.svg" alt=""><h3>Перки</h3><p>По три на ветвь, открываются при 3, 6 и 9 потраченных очках: Берсеркганг, Тихая смерть, Источник эйтра, Лёгкое падение и другие.</p></div>
+      <div class="feature"><img src="../icons/branch_wanderer.svg" alt=""><h3>Свободные очки</h3><p>Каждый побеждённый в вашем мире босс и каждый новый открытый биом дают свободное очко для любой ветви.</p></div>
+      <div class="feature"><img src="../icons/se_severed.svg" alt=""><h3>Смерть</h3><p>Вы теряете часть ещё не превращённого в очки опыта ветвей, но не сами очки. После возрождения 10 минут действуют <em>Подрубленные корни</em>: мастерство на ранг ниже, перки 3-го уровня молчат.</p></div>
+      <div class="feature"><img src="../icons/item_rune.svg" alt=""><h3>Сброс</h3><p>Создайте <em>Руну забвения</em> на верстаке (10 × Камень, 10 × Смола, 5 × Глаз грейдворфа) и используйте её, чтобы вернуть все очки.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="two">
+      <div class="panel">
+        <h3>Долгая сага, а не один вечер</h3>
+        <p>Очко номер <em>n</em> в ветви стоит <code>80 × n<sup>1.5</sup></code> опыта. Первые очки приходят за минуты, а чтобы заполнить ветвь, понадобится целое прохождение.</p>
+        <div class="table-scroll"><table>
+          <tr><th>Очко</th><th>Цена</th><th>Всего</th></tr>
+          <tr><td>1-е</td><td>80</td><td>80</td></tr>
+          <tr><td>5-е</td><td>~900</td><td>~2 200</td></tr>
+          <tr><td>10-е</td><td>~2 500</td><td>~10 000</td></tr>
+          <tr><td>20-е</td><td>~7 200</td><td>~57 000</td></tr>
+        </table></div>
+      </div>
+      <div class="panel">
+        <h3>Сохранения в безопасности</h3>
+        <ul>
+          <li>Обычные уровни навыков никогда не изменяются. Древо хранится в отдельной записи файла персонажа.</li>
+          <li>При первой загрузке существующего персонажа каждые 20 уровней навыка превращаются в 1 очко его ветви.</li>
+          <li>Удалите мод — и навыки будут ровно такими, как до установки. Установите снова — и древо вернётся.</li>
+          <li>Без мода исчезнут только Руны забвения в инвентаре.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="panel">
+      <h3>Мультиплеер</h3>
+      <p>SkillDrasil должен стоять у каждого игрока <strong>и</strong> на сервере, с одинаковой основной версией (major.minor). Jotunn не пустит игрока с другой версией, так что никто не получит нечестного преимущества. Настройки баланса задаёт сервер, а у каждого персонажа своё древо.</p>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Установка</h2>
+    <div class="two">
+      <div class="panel">
+        <ol class="steps">
+          <li>Установите <a href="https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/">BepInExPack Valheim</a>.</li>
+          <li>Установите <a href="https://thunderstore.io/c/valheim/p/ValheimModding/Jotunn/">Jotunn</a>.</li>
+          <li><strong>Сделайте копию персонажей</strong>: <code>…\LocalLow\IronGate\Valheim\characters_local</code> или, при Steam Cloud, <code>Steam\userdata\&lt;id&gt;\892970\remote\characters</code>.</li>
+          <li>Скачайте <a href="https://github.com/RGB-Outl4w/SkillDrasil/releases/latest">последнюю версию</a> и положите <code>SkillDrasil.dll</code> в <code>BepInEx/plugins/SkillDrasil/</code>.</li>
+          <li>Запустите игру и нажмите <strong>K</strong> или кнопку «Навыки» в инвентаре.</li>
+        </ol>
+      </div>
+      <div class="panel">
+        <h3>Настройки</h3>
+        <p><code>BepInEx/config/rgboutl4w.skilldrasil.cfg</code></p>
+        <div class="table-scroll"><table>
+          <tr><th>Ключ</th><th>По умолч.</th><th></th></tr>
+          <tr><td><code>FirstPointXp</code></td><td>80</td><td>Опыт за первое очко ветви (сервер)</td></tr>
+          <tr><td><code>CostExponent</code></td><td>1.5</td><td>Насколько быстро дорожают очки (сервер)</td></tr>
+          <tr><td><code>SeveredRootsSeconds</code></td><td>600</td><td>Длительность дебаффа после смерти (сервер)</td></tr>
+          <tr><td><code>OpenTreeKey</code></td><td>K</td><td>Открывает древо</td></tr>
+          <tr><td><code>CheckForUpdates</code></td><td>true</td><td>Уведомление в главном меню о новой версии</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="runes" aria-hidden="true">ᛁᚷᚷᛞᚱᚨᛋᛁᛚ</div>
+    <p><a href="https://github.com/RGB-Outl4w/SkillDrasil">SkillDrasil на GitHub</a> · <a href="https://github.com/RGB-Outl4w/SkillDrasil/issues">Сообщить о проблеме</a></p>
+    <p>Фанатский мод, не связанный с Iron Gate или Coffee Stain. Valheim — товарный знак Iron Gate AB.</p>
+  </footer>
+</div>
+<script src="../tree.js"></script>
+</body>
+</html>

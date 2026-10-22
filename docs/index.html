@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillDrasil – a skill tree for Valheim</title>
+<meta name="description" content="SkillDrasil replaces Valheim's grind-and-lose skill system with a five-branch skill tree: earn points by playing, choose masteries and perks, keep your choices when you die.">
+<meta property="og:title" content="SkillDrasil – a skill tree for Valheim">
+<meta property="og:description" content="Five branches, 24 masteries, 15 perks. Your deeds feed the roots; your choices shape the branches.">
+<link rel="icon" href="icons/rune.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="ru" href="ru/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@600;800&family=Alegreya:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Runic&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  // First visit from a Russian-language browser: offer the Russian page. A manual choice is remembered.
+  try { if (!localStorage.getItem('sd-lang') && /^ru\b/i.test(navigator.language)) location.replace('ru/'); } catch (e) {}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="#">SkillDrasil</a>
+    <nav>
+      <span class="links"><a href="#tree">The Tree</a></span>
+      <span class="links"><a href="#how">How it works</a></span>
+      <span class="links"><a href="#install">Install</a></span>
+      <a href="https://github.com/RGB-Outl4w/SkillDrasil">GitHub</a>
+      <span class="lang"><a href="./" aria-current="page" onclick="try{localStorage.setItem('sd-lang','en')}catch(e){}">EN</a><a href="ru/" onclick="try{localStorage.setItem('sd-lang','ru')}catch(e){}">RU</a></span>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="runes" aria-hidden="true">ᛋᚲᛁᛚᛚᛞᚱᚨᛋᛁᛚ</div>
+    <h1>SkillDrasil</h1>
+    <p class="tagline">A skill tree for Valheim. Your deeds feed the roots. Your choices shape the branches.</p>
+    <div class="buttons">
+      <a class="btn primary" href="https://github.com/RGB-Outl4w/SkillDrasil/releases/latest">Download latest release</a>
+      <a class="btn" href="#tree">Explore the tree</a>
+    </div>
+    <p class="meta">Valheim 1.0 · BepInEx + Jotunn · English &amp; Русский · Safe to add to and remove from existing saves</p>
+  </section>
+
+  <section class="intro">
+    <div class="versus">
+      <div class="panel old">
+        <h3>Vanilla skills</h3>
+        <ul>
+          <li>Repeat an action and that skill levels up.</li>
+          <li>Die and you lose levels in everything.</li>
+          <li>No choices: every Viking ends up the same.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>SkillDrasil</h3>
+        <ul>
+          <li>Actions feed five branches; full branches give points.</li>
+          <li>You spend the points on masteries and perks.</li>
+          <li>Death costs progress, never your choices.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="tree">
+    <div class="runes" aria-hidden="true">ᚢᚱᛞ ᚢᛖᚱᚦᚨᚾᛞᛁ ᛋᚲᚢᛚᛞ</div>
+    <h2 style="text-align:center">The World Tree</h2>
+    <p class="intro">Five branches. Masteries are the roots, perks are the crown, and the trunk grows with every point you spend in the branch.</p>
+    <div class="panel" data-explorer></div>
+  </section>
+
+
+  <section id="how">
+    <h2>How it works</h2>
+    <div class="grid">
+      <div class="feature"><img src="icons/woodcutting.svg" alt=""><h3>Earn</h3><p>Every swing, shot, swim and stew feeds XP into that skill's branch. A full bar grants a branch point, spent only in that branch.</p></div>
+      <div class="feature"><img src="icons/swords.svg" alt=""><h3>Masteries</h3><p>Every vanilla skill has 5 ranks worth 20 levels each, so all of Valheim's own skill effects still apply. Gear and mead bonuses stack on top.</p></div>
+      <div class="feature"><img src="icons/riposte.svg" alt=""><h3>Perks</h3><p>Three per branch, unlocked at 3, 6 and 9 points spent: Berserkgang, Silent Death, Eitr Well, Featherfall and more.</p></div>
+      <div class="feature"><img src="icons/branch_wanderer.svg" alt=""><h3>Free points</h3><p>Every boss felled in your world and every new biome you discover grants a free point for any branch.</p></div>
+      <div class="feature"><img src="icons/se_severed.svg" alt=""><h3>Death</h3><p>You lose part of each branch's unspent XP, never your points. You rise with <em>Severed Roots</em> for 10 minutes: masteries one rank lower, tier 3 perks silent.</p></div>
+      <div class="feature"><img src="icons/item_rune.svg" alt=""><h3>Respec</h3><p>Craft a <em>Rune of Forgetting</em> at the workbench (10 Stone, 10 Resin, 5 Greydwarf Eye) and consume it to refund every point.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="two">
+      <div class="panel">
+        <h3>A long saga, not an evening</h3>
+        <p>Point <em>n</em> in a branch costs <code>80 × n<sup>1.5</sup></code> XP. The first points come in minutes; filling a branch takes a whole playthrough.</p>
+        <div class="table-scroll"><table>
+          <tr><th>Point</th><th>Cost</th><th>Total so far</th></tr>
+          <tr><td>1st</td><td>80</td><td>80</td></tr>
+          <tr><td>5th</td><td>~900</td><td>~2,200</td></tr>
+          <tr><td>10th</td><td>~2,500</td><td>~10,000</td></tr>
+          <tr><td>20th</td><td>~7,200</td><td>~57,000</td></tr>
+        </table></div>
+      </div>
+      <div class="panel">
+        <h3>Safe for your saves</h3>
+        <ul>
+          <li>Your vanilla skill levels are never written. The tree lives in its own entry in the character file.</li>
+          <li>First load of an existing character: every 20 vanilla levels in a skill become 1 point in that skill's branch.</li>
+          <li>Uninstall and your vanilla skills are exactly as they were. Reinstall and your tree is back.</li>
+          <li>Only Runes of Forgetting in your bags disappear without the mod.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="panel">
+      <h3>Multiplayer</h3>
+      <p>Every player <strong>and</strong> the server must run SkillDrasil, same major.minor version. Jotunn refuses mismatched connections, so nobody joins with an unfair advantage. Balance settings come from the server; each character keeps its own tree.</p>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <div class="two">
+      <div class="panel">
+        <ol class="steps">
+          <li>Install <a href="https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/">BepInExPack Valheim</a>.</li>
+          <li>Install <a href="https://thunderstore.io/c/valheim/p/ValheimModding/Jotunn/">Jotunn</a>.</li>
+          <li><strong>Back up your characters</strong>: <code>…\LocalLow\IronGate\Valheim\characters_local</code> or, with Steam Cloud, <code>Steam\userdata\&lt;id&gt;\892970\remote\characters</code>.</li>
+          <li>Download the <a href="https://github.com/RGB-Outl4w/SkillDrasil/releases/latest">latest release</a> and put <code>SkillDrasil.dll</code> in <code>BepInEx/plugins/SkillDrasil/</code>.</li>
+          <li>Start the game and press <strong>K</strong>, or the Skills button in your inventory.</li>
+        </ol>
+      </div>
+      <div class="panel">
+        <h3>Settings</h3>
+        <p><code>BepInEx/config/rgboutl4w.skilldrasil.cfg</code></p>
+        <div class="table-scroll"><table>
+          <tr><th>Key</th><th>Default</th><th></th></tr>
+          <tr><td><code>FirstPointXp</code></td><td>80</td><td>XP for a branch's first point (server)</td></tr>
+          <tr><td><code>CostExponent</code></td><td>1.5</td><td>How steeply point cost grows (server)</td></tr>
+          <tr><td><code>SeveredRootsSeconds</code></td><td>600</td><td>Debuff length after death (server)</td></tr>
+          <tr><td><code>OpenTreeKey</code></td><td>K</td><td>Opens the tree</td></tr>
+          <tr><td><code>CheckForUpdates</code></td><td>true</td><td>Main-menu notice when a new release is out</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="runes" aria-hidden="true">ᛁᚷᚷᛞᚱᚨᛋᛁᛚ</div>
+    <p><a href="https://github.com/RGB-Outl4w/SkillDrasil">SkillDrasil on GitHub</a> · <a href="https://github.com/RGB-Outl4w/SkillDrasil/issues">Report a problem</a></p>
+    <p>A fan-made mod, not affiliated with Iron Gate or Coffee Stain. Valheim is a trademark of Iron Gate AB.</p>
+  </footer>
+</div>
+<script src="tree.js"></script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 
 A Valheim mod that replaces the vanilla skill system with a skill tree.
 
+**Website:** https://rgb-outl4w.github.io/SkillDrasil/ (English / Русский)
+
 Vanilla: repeat an action → that skill levels up; die → lose levels.
 SkillDrasil: actions still earn XP, but into five **branches**. Full branch XP = one point you **choose** where to spend.
 
@@ -63,4 +65,5 @@ English and Russian. The mod follows Valheim's language setting.
 1. Copy `Environment.props.example` to `Environment.props` and set your Valheim path.
 2. `dotnet build -c Release` (copies the dll into your BepInEx plugins folder).
 3. `dotnet run --project tests/SelfCheck` runs the core logic checks.
-4. Icons: edit `tools/icons.py`, then `python tools/icons.py` and `tools/render-icons.ps1` (needs Edge) to rebuild `assets/atlas.png`.
+4. Icons: edit `tools/icons.py`, then `python tools/icons.py` (also refreshes the website's `docs/icons`) and `tools/render-icons.ps1` (needs Edge) to rebuild `assets/atlas.png`.
+5. Website: static files in `docs/`, served by GitHub Pages. Preview with `python -m http.server 8765 --directory docs`.
