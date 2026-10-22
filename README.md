@@ -30,7 +30,7 @@ SkillDrasil: actions still earn XP, but into five **branches**. Full branch XP =
 - **Uninstall**: your vanilla skill levels are exactly what they were when you installed. Reinstall: your tree is back.
 - Exception: Runes of Forgetting in your inventory disappear if you load the character without the mod.
 
-Back up `%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\characters_local` before trying any mod.
+Back up your characters before trying any mod: `%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\characters_local` (local saves) or `Steam\userdata\<id>\892970\remote\characters` (Steam Cloud saves).
 
 ## Multiplayer
 

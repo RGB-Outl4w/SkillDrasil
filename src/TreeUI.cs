@@ -1,23 +1,55 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jotunn.Managers;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SkillDrasil
 {
-    // Replaces the vanilla skills dialog: 5 branch columns, click a node to select it, Learn to buy a rank.
+    // Replaces the vanilla skills dialog. One tab per branch, drawn as a tree:
+    // masteries are the roots, the trunk grows with points spent, perks form the crown.
     static class TreeUI
     {
-        const float ColumnWidth = 210f, RowHeight = 36f;
-        static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
+        static readonly Vector2 Mid = new Vector2(0.5f, 0.5f);
+        static readonly Color Dim = new Color(0.35f, 0.35f, 0.35f, 1f);
+        static readonly Color Bark = new Color(0.28f, 0.2f, 0.13f, 1f);
+        static readonly Color Sap = new Color(0.95f, 0.62f, 0.18f, 1f);
+        static readonly Color Beige = new Color(0.85f, 0.78f, 0.62f, 1f);
+        static readonly Color Good = new Color(0.55f, 0.9f, 0.45f, 1f);
+        static readonly Color Bad = new Color(1f, 0.45f, 0.4f, 1f);
+        static readonly Color Shade = new Color(0f, 0f, 0f, 0.4f);
+
+        // Trunk geometry inside the tree canvas: perk tier t sits where 3t points have been spent.
+        const float TrunkBase = -120f, TrunkTop = 160f, MaxGate = 9f;
+
+        class NodeView
+        {
+            public Image Border, Frame, Icon;
+            public Image[] Pips;
+            public Text Label;
+        }
 
         static GameObject panel;
-        static Text header, details;
+        static RectTransform canvas;
+        static Text freeText, severedText;
+        static readonly Button[] tabs = new Button[5];
+        static readonly Text[] tabLabels = new Text[5];
+        static readonly Dictionary<string, NodeView> views = new Dictionary<string, NodeView>();
+        static readonly List<(Image line, string node)> roots = new List<(Image, string)>();
+        static RectTransform trunkFill;
+
+        static Image cardIcon, xpFill;
+        static Text cardName, cardKind, cardEffect, cardLore, cardNow, cardReq, branchLine, xpText;
+        static Image[] cardPips;
         static Button learn;
-        static readonly Text[] branchInfo = new Text[5];
-        static readonly Dictionary<string, Text> labels = new Dictionary<string, Text>();
-        static string selected;
+        static Text learnLabel;
+
+        static Branch tab;
+        static string selected, hovered;
+        static readonly Dictionary<string, Sprite> icons = new Dictionary<string, Sprite>();
+        static Sprite slot;
 
         public static bool IsOpen => panel && panel.activeSelf;
 
@@ -39,7 +71,7 @@ namespace SkillDrasil
             if (!panel) Build();
             panel.SetActive(true);
             GUIManager.BlockInput(true);
-            Refresh();
+            ShowTab(tab);
         }
 
         public static void Close()
@@ -48,55 +80,211 @@ namespace SkillDrasil
             GUIManager.BlockInput(false);
         }
 
-        static Text Label(Transform parent, string text, Vector2 pos, float width, float height, int size, Color color)
+        // ---------- building blocks ----------
+
+        static RectTransform Rect(Transform parent, Vector2 pos, Vector2 size)
         {
-            var t = GUIManager.Instance.CreateText(text, parent, Center, Center, pos, GUIManager.Instance.AveriaSerifBold,
+            var go = new GameObject("sd", typeof(RectTransform));
+            var rt = (RectTransform)go.transform;
+            rt.SetParent(parent, false);
+            rt.anchorMin = rt.anchorMax = Mid;
+            rt.anchoredPosition = pos;
+            rt.sizeDelta = size;
+            return rt;
+        }
+
+        static Image Img(Transform parent, Vector2 pos, Vector2 size, Color color, Sprite sprite = null, bool raycast = false)
+        {
+            var img = Rect(parent, pos, size).gameObject.AddComponent<Image>();
+            img.sprite = sprite;
+            img.color = color;
+            img.raycastTarget = raycast;
+            return img;
+        }
+
+        static Text Label(Transform parent, string text, Vector2 pos, float width, float height, int size, Color color,
+            Font font = null, TextAnchor align = TextAnchor.MiddleCenter, FontStyle style = FontStyle.Normal)
+        {
+            var t = GUIManager.Instance.CreateText(text, parent, Mid, Mid, pos, font ?? GUIManager.Instance.AveriaSerifBold,
                 size, color, true, Color.black, width, height, false).GetComponent<Text>();
-            t.alignment = TextAnchor.MiddleCenter;
+            t.alignment = align;
+            t.fontStyle = style;
+            t.raycastTarget = false;
             return t;
         }
 
-        static Button MakeButton(Transform parent, string text, Vector2 pos, float width, float height, UnityEngine.Events.UnityAction onClick)
+        static Button MakeButton(Transform parent, string text, Vector2 pos, float width, float height, Action onClick)
         {
-            var b = GUIManager.Instance.CreateButton(text, parent, Center, Center, pos, width, height).GetComponent<Button>();
-            b.onClick.AddListener(onClick);
+            var b = GUIManager.Instance.CreateButton(text, parent, Mid, Mid, pos, width, height).GetComponent<Button>();
+            b.onClick.AddListener(() => onClick());
             return b;
         }
 
+        static Image Line(Transform parent, Vector2 a, Vector2 b, float thickness, Color color)
+        {
+            var img = Img(parent, a, new Vector2(Vector2.Distance(a, b), thickness), color);
+            img.rectTransform.pivot = new Vector2(0f, 0.5f);
+            img.rectTransform.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(b.y - a.y, b.x - a.x) * Mathf.Rad2Deg);
+            return img;
+        }
+
+        static Image[] Pips(Transform parent, Vector2 center, int count, float size)
+        {
+            var pips = new Image[count];
+            float step = size + 3f;
+            for (int i = 0; i < count; i++)
+                pips[i] = Img(parent, center + new Vector2((i - (count - 1) / 2f) * step, 0f), new Vector2(size, size), Bark);
+            return pips;
+        }
+
+        static void On(GameObject go, EventTriggerType type, Action action)
+        {
+            var trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+            var entry = new EventTrigger.Entry { eventID = type };
+            entry.callback.AddListener(_ => action());
+            trigger.triggers.Add(entry);
+        }
+
+        static Sprite SkillIcon(int skill) =>
+            Player.m_localPlayer.m_skills.m_skills.FirstOrDefault(d => (int)d.m_skill == skill)?.m_icon;
+
+        static Sprite IconOf(Node n)
+        {
+            if (icons.TryGetValue(n.Id, out var cached)) return cached;
+            Sprite s = null;
+            if (n.IsMastery) s = SkillIcon(n.Skill);
+            else
+            {
+                var prefab = ObjectDB.instance ? ObjectDB.instance.GetItemPrefab(n.Icon) : null;
+                var drop = prefab ? prefab.GetComponent<ItemDrop>() : null;
+                if (drop) s = drop.m_itemData.GetIcon();
+                else Plugin.Log.LogWarning($"No item prefab '{n.Icon}' for perk icon {n.Id}");
+            }
+            return icons[n.Id] = s ? s : SkillIcon(TreeDef.BranchIconSkill[(int)n.Branch]);
+        }
+
+        // ---------- layout ----------
+
         static void Build()
         {
-            var gui = GUIManager.Instance;
-            panel = gui.CreateWoodpanel(GUIManager.CustomGUIFront.transform, Center, Center, Vector2.zero, 1120f, 700f, false);
+            icons.Clear();
+            var slotPrefab = InventoryGui.instance ? InventoryGui.instance.m_playerGrid.m_elementPrefab : null;
+            slot = slotPrefab ? slotPrefab.GetComponent<Image>()?.sprite : null;
+
+            panel = GUIManager.Instance.CreateWoodpanel(GUIManager.CustomGUIFront.transform, Mid, Mid, Vector2.zero, 1180f, 760f, false);
             var root = panel.transform;
 
-            header = Label(root, "", new Vector2(0f, 310f), 900f, 40f, 28, GUIManager.Instance.ValheimOrange);
-            MakeButton(root, "Close", new Vector2(490f, 310f), 100f, 34f, Close);
+            Label(root, "SkillDrasil", new Vector2(-400f, 336f), 340f, 50f, 40, GUIManager.Instance.ValheimOrange,
+                GUIManager.Instance.NorseBold, TextAnchor.MiddleLeft);
+            freeText = Label(root, "", new Vector2(190f, 344f), 420f, 30f, 22, GUIManager.Instance.ValheimOrange, align: TextAnchor.MiddleRight);
+            severedText = Label(root, "", new Vector2(190f, 318f), 420f, 24f, 15, Bad, align: TextAnchor.MiddleRight);
+            MakeButton(root, "Close", new Vector2(510f, 336f), 110f, 38f, Close);
 
             for (int b = 0; b < 5; b++)
             {
-                float x = (b - 2) * (ColumnWidth + 10f);
-                Label(root, TreeDef.BranchNames[b], new Vector2(x, 262f), ColumnWidth, 30f, 22, GUIManager.Instance.ValheimOrange);
-                branchInfo[b] = Label(root, "", new Vector2(x, 234f), ColumnWidth, 26f, 14, Color.white);
-
-                var nodes = TreeDef.Nodes.Where(n => (int)n.Branch == b).ToArray();
-                for (int i = 0; i < nodes.Length; i++)
-                {
-                    string id = nodes[i].Id;
-                    var button = MakeButton(root, "", new Vector2(x, 195f - i * RowHeight), ColumnWidth, RowHeight - 4f, () => Select(id));
-                    labels[id] = button.GetComponentInChildren<Text>();
-                }
+                var br = (Branch)b;
+                var t = MakeButton(root, "", new Vector2(-470f + b * 235f, 272f), 225f, 48f, () => ShowTab(br));
+                tabLabels[b] = t.GetComponentInChildren<Text>();
+                tabLabels[b].alignment = TextAnchor.MiddleCenter;
+                tabLabels[b].rectTransform.offsetMin = new Vector2(34f, 0f);
+                Img(t.transform, new Vector2(-82f, 0f), new Vector2(34f, 34f), Color.white, SkillIcon(TreeDef.BranchIconSkill[b]));
+                tabs[b] = t;
             }
 
-            details = Label(root, "", new Vector2(-110f, -285f), 840f, 80f, 16, Color.white);
-            learn = MakeButton(root, "Learn", new Vector2(440f, -285f), 160f, 44f, Learn);
-            selected = null;
+            canvas = Img(root, new Vector2(-195f, -60f), new Vector2(740f, 590f), Shade).rectTransform;
+            BuildCard(Img(root, new Vector2(385f, -60f), new Vector2(390f, 590f), Shade).transform);
         }
 
-        static void Select(string id)
+        static void BuildCard(Transform card)
         {
-            selected = id;
+            Img(card, new Vector2(0f, 220f), new Vector2(112f, 112f), Color.white, slot);
+            cardIcon = Img(card, new Vector2(0f, 220f), new Vector2(84f, 84f), Color.white);
+            cardName = Label(card, "", new Vector2(0f, 140f), 360f, 36f, 26, GUIManager.Instance.ValheimOrange, GUIManager.Instance.NorseBold);
+            cardKind = Label(card, "", new Vector2(0f, 112f), 360f, 24f, 15, Beige);
+            cardPips = Pips(card, new Vector2(0f, 88f), 5, 14f);
+            cardEffect = Label(card, "", new Vector2(0f, 40f), 340f, 64f, 18, Color.white);
+            cardLore = Label(card, "", new Vector2(0f, -18f), 340f, 52f, 15, Beige, GUIManager.Instance.AveriaSerif, style: FontStyle.Italic);
+            cardNow = Label(card, "", new Vector2(0f, -62f), 340f, 26f, 15, Color.white);
+            cardReq = Label(card, "", new Vector2(0f, -90f), 340f, 26f, 15, Good);
+            learn = MakeButton(card, "Learn", new Vector2(0f, -136f), 230f, 46f, Learn);
+            learnLabel = learn.GetComponentInChildren<Text>();
+
+            Img(card, new Vector2(0f, -178f), new Vector2(330f, 2f), Bark);
+            branchLine = Label(card, "", new Vector2(0f, -200f), 360f, 26f, 16, Beige);
+            Img(card, new Vector2(0f, -228f), new Vector2(320f, 16f), Bark);
+            xpFill = Img(card, new Vector2(-160f, -228f), new Vector2(0f, 12f), Sap);
+            xpFill.rectTransform.pivot = new Vector2(0f, 0.5f);
+            xpText = Label(card, "", new Vector2(0f, -252f), 360f, 22f, 14, Color.white);
+        }
+
+        static void ShowTab(Branch b)
+        {
+            tab = b;
+            if (selected != null && TreeDef.ById[selected].Branch != b) selected = null;
+            hovered = null;
+            for (int i = canvas.childCount - 1; i >= 0; i--) UnityEngine.Object.Destroy(canvas.GetChild(i).gameObject);
+            views.Clear();
+            roots.Clear();
+            BuildTree(b);
             Refresh();
         }
+
+        static void BuildTree(Branch b)
+        {
+            var c = canvas.transform;
+            Label(c, TreeDef.BranchLore[(int)b], new Vector2(0f, 272f), 700f, 28f, 16, Beige, GUIManager.Instance.AveriaSerif, style: FontStyle.Italic);
+
+            var masteries = TreeDef.Nodes.Where(n => n.Branch == b && n.IsMastery).ToArray();
+            var perks = TreeDef.Nodes.Where(n => n.Branch == b && !n.IsMastery).OrderBy(n => n.Tier).ToArray();
+
+            // Root positions: a shallow arc under the trunk, outer roots a little higher.
+            float spacing = masteries.Length > 1 ? Mathf.Min(150f, 660f / (masteries.Length - 1)) : 0f;
+            var rootPos = masteries.Select((n, i) =>
+            {
+                float x = (i - (masteries.Length - 1) / 2f) * spacing;
+                return new Vector2(x, -205f + 45f * (x / 330f) * (x / 330f));
+            }).ToArray();
+            var basePoint = new Vector2(0f, TrunkBase);
+            for (int i = 0; i < masteries.Length; i++)
+                roots.Add((Line(c, basePoint, rootPos[i], 6f, Bark), masteries[i].Id));
+
+            // Trunk with its growth fill and tier gates.
+            Img(c, new Vector2(0f, (TrunkBase + TrunkTop) / 2f), new Vector2(16f, TrunkTop - TrunkBase), Bark);
+            trunkFill = Img(c, basePoint, new Vector2(8f, 0f), Sap).rectTransform;
+            trunkFill.pivot = new Vector2(0.5f, 0f);
+            var perkPos = new[] { new Vector2(-215f, GateY(1)), new Vector2(215f, GateY(2)), new Vector2(0f, 212f) };
+            for (int t = 1; t <= 3; t++)
+            {
+                var gate = new Vector2(0f, GateY(t));
+                Line(c, gate, perkPos[t - 1], 8f, Bark);
+                Img(c, gate, new Vector2(26f, 6f), Beige);
+                Label(c, $"{t * 3}", gate + new Vector2(t == 2 ? -32f : 32f, 0f), 40f, 22f, 14, Beige);
+            }
+
+            for (int i = 0; i < masteries.Length; i++) views[masteries[i].Id] = BuildNode(c, masteries[i], rootPos[i], 62f);
+            for (int i = 0; i < perks.Length; i++) views[perks[i].Id] = BuildNode(c, perks[i], perkPos[i], 76f);
+        }
+
+        static float GateY(int tier) => TrunkBase + (TrunkTop - TrunkBase) * Mathf.Min(1f, tier * 3f / MaxGate);
+
+        static NodeView BuildNode(Transform parent, Node n, Vector2 pos, float size)
+        {
+            var v = new NodeView();
+            v.Border = Img(parent, pos, new Vector2(size + 8f, size + 8f), Color.clear, null, raycast: true);
+            v.Frame = Img(v.Border.transform, Vector2.zero, new Vector2(size, size), Color.white, slot);
+            v.Icon = Img(v.Border.transform, Vector2.zero, new Vector2(size * 0.72f, size * 0.72f), Color.white, IconOf(n));
+            float below = -size / 2f - 4f;
+            if (n.IsMastery) v.Pips = Pips(v.Border.transform, new Vector2(0f, below - 8f), n.MaxRank, 9f);
+            v.Label = Label(v.Border.transform, n.Name, new Vector2(0f, below - (n.IsMastery ? 26f : 14f)), 150f, 22f, 14, Color.white);
+
+            string id = n.Id;
+            On(v.Border.gameObject, EventTriggerType.PointerEnter, () => { hovered = id; Refresh(); });
+            On(v.Border.gameObject, EventTriggerType.PointerExit, () => { if (hovered == id) { hovered = null; Refresh(); } });
+            On(v.Border.gameObject, EventTriggerType.PointerClick, () => { selected = id; Refresh(); });
+            return v;
+        }
+
+        // ---------- state ----------
 
         static void Learn()
         {
@@ -107,41 +295,107 @@ namespace SkillDrasil
         {
             var s = Tree.Local;
             if (s == null || !panel) return;
-            var p = Player.m_localPlayer;
-            bool severed = Tree.Severed(p);
+            bool severed = Tree.Severed(Player.m_localPlayer);
 
-            header.text = $"SkillDrasil  -  Free points: {s.FreeAvailable}" + (severed ? "  -  <color=#ff6060>Severed Roots</color>" : "");
+            freeText.text = $"Free points: {s.FreeAvailable}";
+            severedText.text = severed ? "Severed Roots: masteries -1 rank, tier 3 perks off" : "";
 
             for (int b = 0; b < 5; b++)
             {
-                var br = (Branch)b;
-                float cost = TreeState.PointCost(s.Earned[b], Plugin.XpBase.Value, Plugin.XpGrowth.Value);
-                branchInfo[b].text = $"XP {s.Xp[b]:0}/{cost:0}  |  {s.BranchAvailable(br)} pts  |  {s.Spent(br)} spent";
+                int avail = s.BranchAvailable((Branch)b);
+                tabLabels[b].text = TreeDef.BranchNames[b] + (avail > 0 ? $"  <color=#f0a030>{avail}</color>" : "");
+                tabs[b].interactable = b != (int)tab;
             }
 
-            foreach (var n in TreeDef.Nodes)
+            int spent = s.Spent(tab);
+            trunkFill.sizeDelta = new Vector2(8f, (TrunkTop - TrunkBase) * Mathf.Min(1f, spent / MaxGate));
+            foreach (var (line, node) in roots) line.color = s.Rank(node) > 0 ? Sap : Bark;
+
+            foreach (var kv in views)
             {
+                var n = TreeDef.ById[kv.Key];
+                var v = kv.Value;
                 int rank = s.Rank(n.Id);
-                var label = labels[n.Id];
-                label.text = n.IsMastery ? $"{n.Name}  {rank}/{n.MaxRank}" : $"{n.Name}" + (rank > 0 ? "  (learned)" : "");
-                label.color = rank >= n.MaxRank ? GUIManager.Instance.ValheimYellow
-                    : s.CanSpend(n.Id) == null ? Color.white
-                    : new Color(0.55f, 0.55f, 0.55f);
-                if (n.Id == selected) label.text = "> " + label.text + " <";
+                bool canLearn = s.CanSpend(n.Id) == null;
+                v.Icon.color = rank > 0 ? Color.white : canLearn ? new Color(0.75f, 0.75f, 0.75f, 1f) : Dim;
+                v.Frame.color = rank > 0 || canLearn ? Color.white : Dim;
+                v.Border.color = n.Id == selected ? Color.white
+                    : rank >= n.MaxRank ? GUIManager.Instance.ValheimYellow
+                    : canLearn ? Sap
+                    : Color.clear;
+                v.Label.color = rank > 0 ? GUIManager.Instance.ValheimOrange : canLearn ? Color.white : Dim;
+                if (v.Pips != null)
+                    for (int i = 0; i < v.Pips.Length; i++) v.Pips[i].color = i < rank ? Sap : Bark;
             }
 
-            if (selected == null)
+            RefreshCard(s, severed);
+        }
+
+        static void RefreshCard(TreeState s, bool severed)
+        {
+            int b = (int)tab;
+            float cost = TreeState.PointCost(s.Earned[b], Plugin.XpBase.Value, Plugin.XpGrowth.Value);
+            branchLine.text = $"{TreeDef.BranchNames[b]}:  {s.BranchAvailable(tab)} unspent  ·  {s.Spent(tab)} spent";
+            xpFill.rectTransform.sizeDelta = new Vector2(320f * Mathf.Clamp01(s.Xp[b] / cost), 12f);
+            xpText.text = $"{s.Xp[b]:0} / {cost:0} XP to next point";
+
+            string id = hovered ?? selected;
+            if (id == null)
             {
-                details.text = "Select a node. Points earned by a branch's skills are spent in that branch; free points go anywhere.";
-                learn.interactable = false;
+                cardIcon.sprite = SkillIcon(TreeDef.BranchIconSkill[b]);
+                cardIcon.color = Color.white;
+                cardName.text = TreeDef.BranchNames[b];
+                cardKind.text = "Branch";
+                foreach (var p in cardPips) p.enabled = false;
+                cardEffect.text = "Use this branch's skills to earn its points.\nBosses and new biomes give free points.";
+                cardLore.text = TreeDef.BranchLore[b];
+                cardNow.text = "Hover a node to inspect it, click to select it.";
+                cardReq.text = "";
+                learn.gameObject.SetActive(false);
                 return;
             }
-            var node = TreeDef.ById[selected];
-            string kind = node.IsMastery ? "Mastery" : $"Tier {node.Tier} perk";
-            string reason = s.CanSpend(selected);
-            details.text = $"{node.Name} ({TreeDef.BranchNames[(int)node.Branch]} {kind}, rank {s.Rank(selected)}/{node.MaxRank})\n" +
-                           $"{node.Effect}\n" + (reason ?? "Ready to learn.");
-            learn.interactable = reason == null;
+
+            var n = TreeDef.ById[id];
+            int rank = s.Rank(id);
+            string reason = s.CanSpend(id);
+            cardIcon.sprite = IconOf(n);
+            cardIcon.color = rank > 0 ? Color.white : Dim;
+            cardName.text = n.Name;
+            cardKind.text = n.IsMastery ? $"Mastery  ·  {TreeDef.BranchNames[b]}" : $"Tier {n.Tier} perk  ·  {TreeDef.BranchNames[b]}";
+            for (int i = 0; i < cardPips.Length; i++)
+            {
+                cardPips[i].enabled = n.IsMastery;
+                cardPips[i].color = i < rank ? Sap : Bark;
+            }
+            cardEffect.text = n.Effect;
+            cardLore.text = n.IsMastery ? SkillDescription(n.Skill) : n.Lore;
+
+            if (n.IsMastery)
+            {
+                int effective = severed && rank > 0 ? rank - 1 : rank;
+                cardNow.text = rank >= n.MaxRank
+                    ? $"Level {effective * TreeDef.LevelsPerRank} (max)"
+                    : $"Level {effective * TreeDef.LevelsPerRank}  ->  {(effective + 1) * TreeDef.LevelsPerRank} at rank {rank + 1}";
+            }
+            else cardNow.text = rank > 0 ? (n.Tier == 3 && severed ? "Learned (inactive: Severed Roots)" : "Learned") : "Not learned";
+
+            cardReq.text = reason ?? (rank >= n.MaxRank ? "" : "Ready to learn");
+            cardReq.color = reason == null ? Good : Bad;
+
+            bool showLearn = id == selected && rank < n.MaxRank;
+            learn.gameObject.SetActive(showLearn);
+            if (showLearn)
+            {
+                learn.interactable = reason == null;
+                learnLabel.text = s.BranchAvailable(n.Branch) > 0 ? $"Learn ({TreeDef.BranchNames[b]} point)" : "Learn (free point)";
+            }
+            else if (id != selected && rank < n.MaxRank) cardReq.text += reason == null ? "  ·  click to select" : "";
+        }
+
+        static string SkillDescription(int skill)
+        {
+            var def = Player.m_localPlayer.m_skills.m_skills.FirstOrDefault(d => (int)d.m_skill == skill);
+            return def != null && Localization.instance != null ? Localization.instance.Localize(def.m_description) : "";
         }
     }
 }

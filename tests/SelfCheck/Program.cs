@@ -54,6 +54,9 @@ static class Program
         var m = TreeState.Migrate(new Dictionary<int, float> { [1] = 45f, [7] = 19.9f, [9] = 100f, [999] = 50f });
         Check(m.Earned[(int)Branch.Warrior] == 2 && m.Earned[(int)Branch.Seidr] == 5 && m.Ranks.Count == 0, "migration");
 
+        // Node ids are save keys: renaming a display name must not change them.
+        Check(new[] { "swords", "elementalmagic", "bloodmagic", "woodcutting", "shieldwall", "hearthkeeper" }.All(TreeDef.ById.ContainsKey), "stable ids");
+
         // Every node in every branch is reachable (no gating deadlock).
         var all = new TreeState { FreeEarned = 1000 };
         for (bool progress = true; progress;)

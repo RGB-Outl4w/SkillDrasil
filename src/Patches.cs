@@ -30,6 +30,7 @@ namespace SkillDrasil
         public static void Bind(Player p)
         {
             owner = p;
+            migratedPoints = 0; // character select previews also bind; never carry their count over
             p.m_customData.TryGetValue(TreeState.Key, out var raw);
             state = TreeState.Parse(raw);
             if (state != null) return;
