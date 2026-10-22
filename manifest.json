@@ -1,6 +1,6 @@
 {
   "name": "SkillDrasil",
-  "version_number": "0.1.0",
+  "version_number": "0.1.1",
   "website_url": "https://github.com/RGB-Outl4w/SkillDrasil",
   "description": "Replaces vanilla skills with a skill tree: branch XP, chosen masteries and perks, softer death. Save-safe install and uninstall.",
   "dependencies": [
