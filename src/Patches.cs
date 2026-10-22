@@ -136,7 +136,7 @@ namespace SkillDrasil
             if (!TreeDef.BySkill.TryGetValue((int)skillType, out var n)) return false;
             var def = __instance.GetSkillDef(skillType);
             float xp = (def?.m_increseStep ?? 1f) * factor * Game.m_skillGainRate;
-            if (s.AddXp(n.Branch, xp, Plugin.XpBase.Value, Plugin.XpGrowth.Value) > 0)
+            if (s.AddXp(n.Branch, xp, Plugin.FirstPointXp.Value, Plugin.CostExponent.Value) > 0)
             {
                 var p = __instance.m_player;
                 p.OnSkillLevelup(skillType, 0f);

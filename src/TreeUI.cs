@@ -115,6 +115,7 @@ namespace SkillDrasil
                 size, color, true, Color.black, width, height, false).GetComponent<Text>();
             t.alignment = align;
             t.fontStyle = style;
+            t.verticalOverflow = VerticalWrapMode.Overflow;
             t.raycastTarget = false;
             return t;
         }
@@ -196,8 +197,8 @@ namespace SkillDrasil
             cardName = Label(card, "", new Vector2(0f, 140f), 370f, 36f, 26, GUIManager.Instance.ValheimOrange, HeadingFont);
             cardKind = Label(card, "", new Vector2(0f, 112f), 370f, 24f, 15, Pale);
             cardPips = Pips(card, new Vector2(0f, 88f), 5, 16f);
-            cardEffect = Label(card, "", new Vector2(0f, 40f), 350f, 66f, 18, Color.white);
-            cardLore = Label(card, "", new Vector2(0f, -18f), 350f, 52f, 15, Pale, GUIManager.Instance.AveriaSerif, style: FontStyle.Italic);
+            cardEffect = Label(card, "", new Vector2(0f, 42f), 360f, 80f, 17, Color.white);
+            cardLore = Label(card, "", new Vector2(0f, -20f), 360f, 44f, 15, Pale, GUIManager.Instance.AveriaSerif, style: FontStyle.Italic);
             cardNow = Label(card, "", new Vector2(0f, -62f), 360f, 26f, 15, Color.white);
             cardReq = Label(card, "", new Vector2(0f, -90f), 360f, 26f, 15, Good);
             learn = MakeButton(card, "", new Vector2(0f, -136f), 300f, 46f, Learn);
@@ -327,10 +328,8 @@ namespace SkillDrasil
         static void RefreshCard(TreeState s, bool severed)
         {
             int b = (int)tab;
-            float cost = TreeState.PointCost(s.Earned[b], Plugin.XpBase.Value, Plugin.XpGrowth.Value);
-            branchLine.text = TreeState.BranchCap > 0
-                ? L.T("branch_line_cap", L.Branch(tab), s.BranchAvailable(tab), s.Spent(tab), TreeState.BranchCap)
-                : L.T("branch_line", L.Branch(tab), s.BranchAvailable(tab), s.Spent(tab));
+            float cost = TreeState.PointCost(s.Earned[b], Plugin.FirstPointXp.Value, Plugin.CostExponent.Value);
+            branchLine.text = L.T("branch_line", L.Branch(tab), s.BranchAvailable(tab), s.Spent(tab));
             xpFill.rectTransform.sizeDelta = new Vector2(320f * Mathf.Clamp01(s.Xp[b] / cost), 10f);
             xpText.text = L.T("xp", s.Xp[b].ToString("0"), cost.ToString("0"));
 

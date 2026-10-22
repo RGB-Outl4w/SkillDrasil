@@ -24,8 +24,7 @@ namespace SkillDrasil
         const string ReleasesApi = "https://api.github.com/repos/RGB-Outl4w/SkillDrasil/releases/latest";
         const string ReleasesPage = "https://github.com/RGB-Outl4w/SkillDrasil/releases/latest";
 
-        public static ConfigEntry<float> XpBase, XpGrowth, SeveredSeconds;
-        static ConfigEntry<int> branchCap;
+        public static ConfigEntry<float> FirstPointXp, CostExponent, SeveredSeconds;
         public static ConfigEntry<KeyCode> OpenKey;
         static ConfigEntry<bool> checkForUpdates;
         static string latestRelease;
@@ -35,12 +34,9 @@ namespace SkillDrasil
         void Awake()
         {
             Log = Logger;
-            XpBase = Config.BindConfig("Balance", "XpPerPointBase", 60f, "Branch XP needed for the first point.", synced: true);
-            XpGrowth = Config.BindConfig("Balance", "XpPerPointGrowth", 0.25f, "Each earned point makes the next one cost this much more (fraction of base).", synced: true);
+            FirstPointXp = Config.BindConfig("Progression", "FirstPointXp", 80f, "Branch XP for the first point. Point n costs FirstPointXp * n^CostExponent.", synced: true);
+            CostExponent = Config.BindConfig("Progression", "CostExponent", 1.5f, "How steeply point cost grows. 1 = linear, 1.5 = vanilla-like.", synced: true);
             SeveredSeconds = Config.BindConfig("Balance", "SeveredRootsSeconds", 600f, "Duration of the Severed Roots debuff after death.", synced: true);
-            branchCap = Config.BindConfig("Balance", "MaxPointsPerBranch", 20, "Most points one branch can hold, so nobody maxes everything. 0 = no limit.", synced: true);
-            TreeState.BranchCap = branchCap.Value;
-            branchCap.SettingChanged += (_, __) => TreeState.BranchCap = branchCap.Value;
             OpenKey = Config.BindConfig("Client", "OpenTreeKey", KeyCode.K, "Key that opens the skill tree.", synced: false);
             checkForUpdates = Config.BindConfig("Client", "CheckForUpdates", true, "Check GitHub for a newer release on the main menu.", synced: false);
 

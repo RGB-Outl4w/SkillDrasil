@@ -12,10 +12,13 @@ static class Program
 
     static int Main()
     {
-        // XP -> points with growing cost: 10 + 15 = 25 XP for two points at base 10, growth 0.5.
+        // Cost curve: first * n^exp.
+        Check(TreeState.PointCost(0, 80f, 1.5f) == 80f && Math.Abs(TreeState.PointCost(3, 80f, 1.5f) - 640f) < 1e-2, "power curve");
+
+        // XP -> points: with exp = log2(1.5) costs are 10 then 15, so 26 XP buys two points.
         var s = new TreeState();
-        Check(s.AddXp(Branch.Warrior, 26f, 10f, 0.5f) == 2, "two points from 26 xp");
-        Check(Math.Abs(s.Xp[0] - 1f) < 1e-4, "leftover xp");
+        Check(s.AddXp(Branch.Warrior, 26f, 10f, (float)Math.Log(1.5, 2)) == 2, "two points from 26 xp");
+        Check(Math.Abs(s.Xp[0] - 1f) < 1e-3, "leftover xp");
 
         // Gating: mastery rank 2 needs 2 points spent in the branch.
         Check(s.Spend("swords"), "swords rank 1");
@@ -38,7 +41,7 @@ static class Program
 
         // Death: lose a share of in-progress XP only.
         s.LoseXp(0.25f);
-        Check(Math.Abs(s.Xp[0] - 0.75f) < 1e-4 && s.Earned[0] == 2, "death xp loss");
+        Check(Math.Abs(s.Xp[0] - 0.75f) < 1e-3 && s.Earned[0] == 2, "death xp loss");
         s.Spend("swords");
         s.Wipe();
         Check(s.Earned.Sum() == 0 && s.Ranks.Count == 0 && s.FreeEarned == 1, "wipe keeps milestones");
@@ -66,18 +69,6 @@ static class Program
         }
         Check(TreeDef.Nodes.All(n => all.Rank(n.Id) == n.MaxRank), "all nodes reachable");
 
-        // Branch cap: spending stops at the cap, and every branch can still reach its tier 3 perk.
-        TreeState.BranchCap = 20;
-        var capped = new TreeState { FreeEarned = 1000 };
-        foreach (var n in TreeDef.Nodes.Where(n => !n.IsMastery)) Check(n.RequiredSpent(1) < TreeState.BranchCap, "perk reachable under cap");
-        for (bool progress = true; progress;)
-        {
-            progress = false;
-            foreach (var n in TreeDef.Nodes) progress |= capped.Spend(n.Id);
-        }
-        Check(capped.Spent(Branch.Warrior) == 20 && capped.CanSpend("swords") == Block.BranchFull, "warrior capped at 20");
-        Check(capped.Spent(Branch.Seidr) == 13, "small branch unaffected by cap");
-        TreeState.BranchCap = 0;
 
         // Update check version compare.
         Check(VersionUtil.IsNewer("v1.2.0", "1.1.9"), "newer");

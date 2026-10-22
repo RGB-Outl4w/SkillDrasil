@@ -13,8 +13,8 @@ namespace SkillDrasil
             ["severed_banner"] = "Severed Roots: masteries -1 rank, tier 3 perks off",
             ["close"] = "Close",
             ["branch_kind"] = "Branch",
-            ["branch_help"] = "Use this branch's skills to earn its points.\nBosses and new biomes give free points.",
-            ["hover_help"] = "Hover a node to inspect it, click to select it.",
+            ["branch_help"] = "This branch's skills earn its points.\nBosses and new biomes give free points.",
+            ["hover_help"] = "Hover a node for details, click to select.",
             ["kind_mastery"] = "Mastery  ·  {0}",
             ["kind_perk"] = "Tier {0} perk  ·  {1}",
             ["mastery_effect"] = "+{0} {1} skill levels per rank.",
@@ -28,11 +28,9 @@ namespace SkillDrasil
             ["learn_branch"] = "Learn ({0} point)",
             ["learn_free"] = "Learn (free point)",
             ["branch_line"] = "{0}:  {1} unspent  ·  {2} spent",
-            ["branch_line_cap"] = "{0}:  {1} unspent  ·  {2} / {3} spent",
             ["xp"] = "{0} / {1} XP to next point",
             ["block_maxed"] = "Maxed",
             ["block_need"] = "Needs {0} points spent in {1}",
-            ["block_full"] = "Branch is full ({0} points)",
             ["block_none"] = "No points available",
             ["msg_point"] = "{0} point earned ({1} unspent)",
             ["msg_milestone"] = "Milestone reached! Free points +{0}",
@@ -53,8 +51,8 @@ namespace SkillDrasil
             ["severed_banner"] = "Подрубленные корни: мастерство −1 ранг, перки 3-го уровня отключены",
             ["close"] = "Закрыть",
             ["branch_kind"] = "Ветвь",
-            ["branch_help"] = "Используйте навыки этой ветви, чтобы получать её очки.\nБоссы и новые биомы дают свободные очки.",
-            ["hover_help"] = "Наведите на узел, чтобы изучить его, нажмите, чтобы выбрать.",
+            ["branch_help"] = "Навыки ветви приносят её очки.\nБоссы и новые биомы дают свободные очки.",
+            ["hover_help"] = "Наведите на узел — подробности, нажмите — выбор.",
             ["kind_mastery"] = "Мастерство  ·  {0}",
             ["kind_perk"] = "Перк {0}-го уровня  ·  {1}",
             ["mastery_effect"] = "+{0} к уровню навыка «{1}» за ранг.",
@@ -68,11 +66,9 @@ namespace SkillDrasil
             ["learn_branch"] = "Изучить (очко ветви «{0}»)",
             ["learn_free"] = "Изучить (свободное очко)",
             ["branch_line"] = "{0}:  свободно {1}  ·  потрачено {2}",
-            ["branch_line_cap"] = "{0}:  свободно {1}  ·  потрачено {2} / {3}",
             ["xp"] = "{0} / {1} опыта до следующего очка",
             ["block_maxed"] = "Максимум",
             ["block_need"] = "Нужно потратить в ветви «{1}» очков: {0}",
-            ["block_full"] = "Ветвь заполнена (предел: {0})",
             ["block_none"] = "Нет доступных очков",
             ["msg_point"] = "Получено очко ветви «{0}» (свободно: {1})",
             ["msg_milestone"] = "Веха пройдена! Свободные очки +{0}",
@@ -196,7 +192,6 @@ namespace SkillDrasil
         public static string Reason(Block block, int need, Branch b) =>
             block == Block.Maxed ? T("block_maxed")
             : block == Block.NeedSpent ? T("block_need", need, Branch(b))
-            : block == Block.BranchFull ? T("block_full", TreeState.BranchCap)
             : block == Block.NoPoints ? T("block_none")
             : T("ready");
     }

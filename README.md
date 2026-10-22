@@ -20,7 +20,6 @@ SkillDrasil: actions still earn XP, but into five **branches**. Full branch XP =
 - **Branch points** come from using that branch's skills and are spent in that branch.
 - **Free points** (spend anywhere) come from milestones: each boss defeated in the world, each new biome discovered.
 - **Death** (when vanilla would drain skills): lose part of every branch's in-progress XP. Spent points are never lost. You respawn with **Severed Roots** for 10 minutes: masteries count one rank lower and tier 3 perks are off. The "Death skills reset" world modifier wipes branch points instead (free points kept).
-- **Branch cap**: a branch holds at most 20 points (server setting), so you can't max everything. Choose.
 - **Respec**: craft a **Rune of Forgetting** at the workbench (10 Stone, 10 Resin, 5 Greydwarf Eye) and consume it.
 - Open the tree with **K** (configurable) or the inventory's Skills button.
 
@@ -47,10 +46,9 @@ Put `SkillDrasil.dll` in `BepInEx/plugins/SkillDrasil/`.
 
 | Key | Default | |
 |---|---|---|
-| Balance.XpPerPointBase | 60 | XP for the first point in a branch (server-synced) |
-| Balance.XpPerPointGrowth | 0.25 | Each point makes the next cost this much more (server-synced) |
+| Progression.FirstPointXp | 80 | Branch XP for the first point; point n costs `FirstPointXp × n^CostExponent` (server-synced) |
+| Progression.CostExponent | 1.5 | 1 = linear, 1.5 = vanilla-like. About 57k XP for 20 points in one branch (server-synced) |
 | Balance.SeveredRootsSeconds | 600 | Debuff duration (server-synced) |
-| Balance.MaxPointsPerBranch | 20 | Most points one branch can hold; 0 = no limit (server-synced) |
 | Client.OpenTreeKey | K | |
 | Client.CheckForUpdates | true | On the main menu, ask GitHub for the latest release. Only a plain GET to `api.github.com`, nothing sent. |
 

@@ -96,7 +96,7 @@ namespace SkillDrasil
         };
     }
 
-    public enum Block { None, Maxed, NeedSpent, BranchFull, NoPoints }
+    public enum Block { None, Maxed, NeedSpent, NoPoints }
 
     public sealed class TreeState
     {
@@ -125,23 +125,21 @@ namespace SkillDrasil
             }
         }
 
-        public static float PointCost(int earned, float baseXp, float growth) => baseXp * (1f + growth * earned);
+        // Vanilla-like power curve: early points come fast, later ones take a playthrough.
+        public static float PointCost(int earned, float firstXp, float exponent) => firstXp * (float)Math.Pow(earned + 1, exponent);
 
         // Returns points gained.
-        public int AddXp(Branch b, float amount, float baseXp, float growth)
+        public int AddXp(Branch b, float amount, float firstXp, float exponent)
         {
             int i = (int)b, gained = 0;
             Xp[i] += amount;
-            for (float cost; Xp[i] >= (cost = PointCost(Earned[i], baseXp, growth)); gained++)
+            for (float cost; Xp[i] >= (cost = PointCost(Earned[i], firstXp, exponent)); gained++)
             {
                 Xp[i] -= cost;
                 Earned[i]++;
             }
             return gained;
         }
-
-        // Max points one branch can hold, 0 = unlimited. Set from server-synced config.
-        public static int BranchCap;
 
         public Block CanSpend(string id) => CanSpend(id, out _);
 
@@ -152,9 +150,7 @@ namespace SkillDrasil
             int rank = Rank(id);
             need = n.RequiredSpent(rank + 1);
             if (rank >= n.MaxRank) return Block.Maxed;
-            int spent = Spent(n.Branch);
-            if (spent < need) return Block.NeedSpent;
-            if (BranchCap > 0 && spent >= BranchCap) return Block.BranchFull;
+            if (Spent(n.Branch) < need) return Block.NeedSpent;
             if (BranchAvailable(n.Branch) == 0 && FreeAvailable <= 0) return Block.NoPoints;
             return Block.None;
         }
