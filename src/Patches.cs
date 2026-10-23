@@ -112,20 +112,19 @@ namespace SkillDrasil
         [HarmonyPostfix, HarmonyPatch(typeof(Player), nameof(Player.Update))]
         static void Update(Player __instance) => Tree.Tick(__instance);
 
+        // Skills added by other mods are not in the tree: they keep vanilla behaviour everywhere.
+        static bool InTree(Skills.SkillType skill, out Node node) => TreeDef.BySkill.TryGetValue((int)skill, out node);
+
         // Effective level = 20 per mastery rank (one rank less while Severed), plus gear/mead bonuses.
         [HarmonyPrefix, HarmonyPatch(typeof(Skills), nameof(Skills.GetSkillLevel))]
         static bool GetSkillLevel(Skills __instance, Skills.SkillType skillType, ref float __result)
         {
             var s = Tree.For(__instance.m_player);
-            if (s == null) return true;
-            float level = 0f;
-            if (TreeDef.BySkill.TryGetValue((int)skillType, out var n))
-            {
-                int rank = s.Rank(n.Id);
-                if (rank > 0 && Tree.Severed(__instance.m_player)) rank--;
-                level = rank * TreeDef.LevelsPerRank;
-                __instance.m_player.GetSEMan().ModifySkillLevel(skillType, ref level);
-            }
+            if (s == null || !InTree(skillType, out var n)) return true;
+            int rank = s.Rank(n.Id);
+            if (rank > 0 && Tree.Severed(__instance.m_player)) rank--;
+            float level = rank * TreeDef.LevelsPerRank;
+            __instance.m_player.GetSEMan().ModifySkillLevel(skillType, ref level);
             __result = Mathf.Floor(level);
             return false;
         }
@@ -135,8 +134,7 @@ namespace SkillDrasil
         static bool RaiseSkill(Skills __instance, Skills.SkillType skillType, float factor)
         {
             var s = Tree.For(__instance.m_player);
-            if (s == null) return true;
-            if (!TreeDef.BySkill.TryGetValue((int)skillType, out var n)) return false;
+            if (s == null || !InTree(skillType, out var n)) return true;
             var def = __instance.GetSkillDef(skillType);
             float xp = (def?.m_increseStep ?? 1f) * factor * Game.m_skillGainRate;
             if (s.AddXp(n.Branch, xp, Plugin.FirstPointXp.Value, Plugin.CostExponent.Value) > 0)
@@ -155,7 +153,14 @@ namespace SkillDrasil
         {
             var s = Tree.For(__instance.m_player);
             if (s == null) return true;
-            s.LoseXp(__instance.m_DeathLowerFactor * Game.m_skillReductionRate);
+            float factor = __instance.m_DeathLowerFactor * Game.m_skillReductionRate;
+            s.LoseXp(factor);
+            foreach (var kv in __instance.m_skillData)
+            {
+                if (InTree(kv.Key, out _)) continue; // tree skills keep their frozen vanilla values
+                kv.Value.m_level -= kv.Value.m_level * factor;
+                kv.Value.m_accumulator = 0f;
+            }
             Tree.PendingSevered = true;
             __instance.m_player.Message(MessageHud.MessageType.TopLeft, L.T("msg_severed"));
             return false;
@@ -180,6 +185,7 @@ namespace SkillDrasil
                 return true;
             }
             s.Wipe();
+            foreach (var key in __instance.m_skillData.Keys.Where(k => !InTree(k, out _)).ToList()) __instance.m_skillData.Remove(key);
             __instance.m_player.Message(MessageHud.MessageType.TopLeft, L.T("msg_wither"));
             return false;
         }

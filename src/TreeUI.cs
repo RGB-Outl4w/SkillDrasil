@@ -53,6 +53,12 @@ namespace SkillDrasil
 
         static Branch tab;
         static string selected, hovered;
+        static bool showingOther;
+        static Button otherButton;
+        static RectTransform tooltip;
+        static Text tooltipText;
+        static Text hudHint;
+        static float hudTimer;
 
         public static bool IsOpen => panel && panel.activeSelf;
 
@@ -62,6 +68,46 @@ namespace SkillDrasil
                 Close();
             else if (!IsOpen && ZInput.GetKeyDown(Plugin.OpenKey.Value) && CanOpen())
                 Open();
+
+            if (IsOpen && tooltip.gameObject.activeSelf)
+            {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)panel.transform, ZInput.pointerPosition, null, out var local);
+                tooltip.anchoredPosition = local + new Vector2(18f, -18f);
+            }
+
+            if ((hudTimer -= Time.deltaTime) <= 0f)
+            {
+                hudTimer = 1f;
+                UpdateHudHint();
+            }
+        }
+
+        // Small reminder in the bottom-right corner while there are points to spend.
+        static void UpdateHudHint()
+        {
+            var s = Player.m_localPlayer && Hud.instance ? Tree.Local : null;
+            int points = 0;
+            if (s != null)
+            {
+                for (int b = 0; b < 5; b++) points += s.BranchAvailable((Branch)b);
+                points += Mathf.Max(0, s.FreeAvailable);
+            }
+            bool show = points > 0 && !IsOpen && Plugin.ShowPointsHint.Value && GUIManager.CustomGUIFront;
+            if (!show)
+            {
+                if (hudHint) hudHint.gameObject.SetActive(false);
+                return;
+            }
+            if (!hudHint)
+            {
+                var corner = new Vector2(1f, 0f);
+                hudHint = GUIManager.Instance.CreateText("", GUIManager.CustomGUIFront.transform, corner, corner, new Vector2(-200f, 34f),
+                    GUIManager.Instance.AveriaSerifBold, 18, GUIManager.Instance.ValheimOrange, true, Color.black, 380f, 30f, false).GetComponent<Text>();
+                hudHint.alignment = TextAnchor.MiddleRight;
+                hudHint.raycastTarget = false;
+            }
+            hudHint.text = L.T("hud_points", points, Plugin.OpenKey.Value);
+            hudHint.gameObject.SetActive(true);
         }
 
         static bool CanOpen() =>
@@ -75,12 +121,17 @@ namespace SkillDrasil
             if (!panel) Build();
             panel.SetActive(true);
             GUIManager.BlockInput(true);
+            if (hudHint) hudHint.gameObject.SetActive(false);
             ShowTab(tab);
         }
 
         public static void Close()
         {
-            if (panel) panel.SetActive(false);
+            if (panel)
+            {
+                panel.SetActive(false);
+                tooltip.gameObject.SetActive(false);
+            }
             GUIManager.BlockInput(false);
         }
 
@@ -187,8 +238,16 @@ namespace SkillDrasil
                 tabs[b] = t;
             }
 
+            otherButton = MakeButton(root, L.T("other_skills"), new Vector2(-140f, 336f), 190f, 38f, ShowOther);
+
             canvas = Img(root, new Vector2(-195f, -60f), new Vector2(740f, 590f), Shade).rectTransform;
             BuildCard(Img(root, new Vector2(385f, -60f), new Vector2(390f, 590f), Shade).transform);
+
+            tooltip = Img(root, Vector2.zero, new Vector2(280f, 54f), new Color(0.05f, 0.04f, 0.03f, 0.92f)).rectTransform;
+            tooltip.pivot = new Vector2(0f, 1f);
+            tooltipText = Label(tooltip, "", new Vector2(0f, 0f), 264f, 48f, 14, Color.white);
+            tooltipText.supportRichText = true;
+            tooltip.gameObject.SetActive(false);
         }
 
         static void BuildCard(Transform card)
@@ -216,6 +275,7 @@ namespace SkillDrasil
         static void ShowTab(Branch b)
         {
             tab = b;
+            showingOther = false;
             if (selected != null && TreeDef.ById[selected].Branch != b) selected = null;
             hovered = null;
             for (int i = canvas.childCount - 1; i >= 0; i--) UnityEngine.Object.Destroy(canvas.GetChild(i).gameObject);
@@ -294,8 +354,12 @@ namespace SkillDrasil
             v.Label = Label(v.Ring.transform, L.Name(n), labelPos, 170f, 22f, n.IsKeystone ? 16 : 14, Color.white);
 
             string id = n.Id;
-            On(v.Ring.gameObject, EventTriggerType.PointerEnter, () => { hovered = id; Refresh(); });
-            On(v.Ring.gameObject, EventTriggerType.PointerExit, () => { if (hovered == id) { hovered = null; Refresh(); } });
+            On(v.Ring.gameObject, EventTriggerType.PointerEnter, () => { hovered = id; Refresh(); ShowTooltip(id); });
+            On(v.Ring.gameObject, EventTriggerType.PointerExit, () =>
+            {
+                tooltip.gameObject.SetActive(false);
+                if (hovered == id) { hovered = null; Refresh(); }
+            });
             On(v.Ring.gameObject, EventTriggerType.PointerClick, () => { selected = id; Refresh(); });
             return v;
         }
@@ -304,7 +368,10 @@ namespace SkillDrasil
 
         static void Learn()
         {
-            if (selected != null && Tree.Local?.Spend(selected) == true) Refresh();
+            if (selected == null || Tree.Local?.Spend(selected) != true) return;
+            Player.m_localPlayer.OnSkillLevelup(Skills.SkillType.None, 0f); // the vanilla level-up flash and sound
+            Refresh();
+            ShowTooltip(selected);
         }
 
         static void Refresh()
@@ -314,6 +381,7 @@ namespace SkillDrasil
             bool severed = Tree.Severed(Player.m_localPlayer);
 
             freeText.text = L.T("free", s.FreeAvailable);
+            otherButton.gameObject.SetActive(OtherSkills().Any());
             severedText.text = severed ? L.T("severed_banner") : "";
 
             for (int b = 0; b < 5; b++)
@@ -349,6 +417,19 @@ namespace SkillDrasil
 
         static void RefreshCard(TreeState s, bool severed)
         {
+            if (showingOther)
+            {
+                cardFrame.sprite = Icons.Get("frame_perk");
+                cardIcon.sprite = Icons.Get("quickstudy");
+                cardIcon.color = Gold;
+                cardName.text = L.T("other_skills");
+                cardKind.text = "";
+                foreach (var p in cardPips) p.enabled = false;
+                cardEffect.text = L.T("other_help");
+                cardLore.text = cardNow.text = cardReq.text = "";
+                learn.gameObject.SetActive(false);
+                return;
+            }
             int b = (int)tab;
             float cost = TreeState.PointCost(s.Earned[b], Plugin.FirstPointXp.Value, Plugin.CostExponent.Value);
             branchLine.text = L.T("branch_line", L.Branch(tab), s.BranchAvailable(tab), s.Spent(tab));
@@ -409,6 +490,46 @@ namespace SkillDrasil
                 learnLabel.text = s.BranchAvailable(n.Branch) > 0 ? L.T("learn_branch", L.Branch(tab)) : L.T("learn_free");
             }
             else if (id != selected && block == Block.None) cardReq.text += "  ·  " + L.T("click_select");
+        }
+
+        static void ShowTooltip(string id)
+        {
+            var s = Tree.Local;
+            if (s == null) return;
+            var n = TreeDef.ById[id];
+            int rank = s.Rank(id);
+            var block = s.CanSpend(id, out int need);
+            string state = block == Block.Maxed ? L.T("tip_maxed")
+                : block == Block.None ? L.T("tip_learn", rank, n.MaxRank)
+                : L.Reason(block, need, n.Branch);
+            tooltipText.text = $"<color=#ffb347>{L.Name(n)}</color>  {rank}/{n.MaxRank}\n{state}";
+            tooltip.gameObject.SetActive(true);
+        }
+
+        // Skills added by other mods (not part of the tree) keep vanilla levelling; this lists them.
+        static IEnumerable<Skills.SkillType> OtherSkills() =>
+            Player.m_localPlayer ? Player.m_localPlayer.m_skills.m_skillData.Keys.Where(k => k != Skills.SkillType.None && !TreeDef.BySkill.ContainsKey((int)k))
+                : Enumerable.Empty<Skills.SkillType>();
+
+        static void ShowOther()
+        {
+            showingOther = true;
+            selected = hovered = null;
+            for (int i = canvas.childCount - 1; i >= 0; i--) UnityEngine.Object.Destroy(canvas.GetChild(i).gameObject);
+            views.Clear();
+            roots.Clear();
+            var c = canvas.transform;
+            var skills = Player.m_localPlayer.m_skills;
+            float y = 250f;
+            foreach (var type in OtherSkills())
+            {
+                Img(c, new Vector2(-300f, y), new Vector2(36f, 36f), Color.white, skills.GetSkillDef(type)?.m_icon);
+                Label(c, Localization.instance.Localize("$skill_" + type.ToString().ToLowerInvariant()), new Vector2(-60f, y), 420f, 30f, 18, Color.white, align: TextAnchor.MiddleLeft);
+                Label(c, L.T("other_level", Mathf.FloorToInt(skills.GetSkillLevel(type))), new Vector2(250f, y), 160f, 30f, 18, GUIManager.Instance.ValheimOrange, align: TextAnchor.MiddleRight);
+                if ((y -= 44f) < -270f) break;
+            }
+            for (int b = 0; b < 5; b++) tabs[b].interactable = true;
+            Refresh();
         }
 
         static string SkillDescription(int skill)

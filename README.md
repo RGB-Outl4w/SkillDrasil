@@ -55,7 +55,9 @@ Manual: put `SkillDrasil.dll` in `BepInEx/plugins/SkillDrasil/`.
 | Progression.FirstPointXp | 80 | Branch XP for the first point; point n costs `FirstPointXp × n^CostExponent` (server-synced) |
 | Progression.CostExponent | 1.5 | 1 = linear, 1.5 = vanilla-like. About 57k XP for 20 points in one branch (server-synced) |
 | Balance.SeveredRootsSeconds | 600 | Debuff duration (server-synced) |
+| Balance.PerkStrength | 1 | Scales every perk and keystone bonus, 0–3; drawbacks stay fixed (server-synced) |
 | Client.OpenTreeKey | K | |
+| Client.ShowPointsHint | true | HUD hint while you have unspent points |
 | Client.CheckForUpdates | true | On the main menu, ask GitHub for the latest release. Only a plain GET to `api.github.com`, nothing sent. |
 
 Console (with `devcommands`): `skilldrasil_points <n>` adds free points.

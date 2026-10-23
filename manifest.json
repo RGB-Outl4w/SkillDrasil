@@ -1,6 +1,6 @@
 {
   "name": "SkillDrasil",
-  "version_number": "0.3.0",
+  "version_number": "0.3.1",
   "website_url": "https://rgb-outl4w.github.io/SkillDrasil/",
   "description": "Replaces vanilla skills with a skill tree: five branches, masteries and perks you choose, softer death. Save-safe. English & Russian.",
   "dependencies": [

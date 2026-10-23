@@ -16,14 +16,16 @@ ICONS = {
             f'<path d="M34 16 C44 10 54 14 57 24 C54 34 46 36 40 36 C41 30 39 24 34 22 Z" {F}/>',
     'clubs': f'<path d="M12 54 L32 32" stroke-width="5"/><circle cx="39" cy="25" r="11" {F}/>'
              '<path d="M39 9 V14 M52 12 L48 16 M55 25 H50 M52 38 L48 34 M26 12 L30 16 M23 25 H28"/>',
-    'polearms': '<path d="M8 58 L44 22"/>'
-                f'<path d="M40 26 L55 7 L52 20 Z" {F}/><path d="M44 22 C50 24 52 30 48 34"/>',
+    'polearms': '<path d="M8 60 L40 28" stroke-width="3.5"/>'
+                f'<path d="M36 24 L46 14 L58 4 L54 18 L44 28 Z" {F}/>'
+                '<path d="M40 28 L32 22 C30 16 34 12 38 14" stroke-width="3"/>'
+                '<path d="M14 54 L18 58" stroke-width="4"/>',
     'spears': '<path d="M10 56 L42 24"/>'
               f'<path d="M40 26 C42 14 50 8 57 7 C56 14 50 22 38 24 Z" {F}/><path d="M36 22 L44 30" stroke-width="3"/>',
-    'unarmed': f'<rect x="16" y="20" width="32" height="24" rx="7" {F}/>'
-               '<path d="M25 20 V30 M32 20 V30 M39 20 V30" stroke="#000" stroke-width="2.5"/>'
-               '<path d="M16 34 C12 38 14 44 22 42" stroke="#000" stroke-width="2.5"/>'
-               f'<rect x="21" y="46" width="22" height="10" rx="2" {F}/>',
+    'unarmed': f'<path d="M14 26 C14 20 20 18 24 20 C26 16 32 16 34 20 C36 16 42 16 44 21 C48 18 54 21 52 28 V40 C52 48 46 52 38 52 H26 C18 52 14 46 14 40 Z" {F}/>'
+               '<path d="M24 20 V30 M34 20 V30 M44 22 V30" stroke="#000" stroke-width="2.5"/>'
+               '<path d="M14 36 C20 34 28 36 30 42" stroke="#000" stroke-width="2.5"/>'
+               f'<rect x="24" y="52" width="18" height="8" rx="2" {F}/>',
     'blocking': f'<circle cx="32" cy="32" r="23" stroke-width="4"/><circle cx="32" cy="32" r="6" {F}/>'
                 '<path d="M32 9 V26 M32 38 V55 M9 32 H26 M38 32 H55" stroke-width="2.5"/>',
     # Hunter masteries
@@ -56,9 +58,10 @@ ICONS = {
             f'<circle cx="21" cy="38" r="1.8" {K}/><circle cx="43" cy="38" r="1.8" {K}/>',
     # Artisan masteries
     'pickaxes': '<path d="M8 24 Q32 4 56 24" stroke-width="5.5"/><path d="M32 14 V58" stroke-width="4.5"/>',
-    'woodcutting': '<path d="M12 36 V52 Q32 60 52 52 V36"/><ellipse cx="32" cy="36" rx="20" ry="7"/>'
-                   '<ellipse cx="32" cy="36" rx="9" ry="3" stroke-width="2.5"/>'
-                   f'<path d="M38 30 L54 6" stroke-width="4"/><polygon points="30,24 42,28 38,38 26,33" {F}/>',
+    'woodcutting': '<path d="M14 6 V58 M34 6 V58" stroke-width="3.5"/><path d="M14 58 H34" stroke-width="3.5"/>'
+                   '<path d="M20 18 C22 24 22 30 20 36" stroke-width="2"/>'
+                   f'<path d="M56 18 L36 34" stroke-width="4"/><polygon points="30,26 40,28 38,40 28,38" {F}/>'
+                   '<path d="M44 46 L50 44 M46 52 L54 54 M40 54 L42 60" stroke-width="2.5"/>',
     'fishing': '<circle cx="40" cy="8" r="3.5" stroke-width="3"/><path d="M40 12 V40 A11 11 0 1 1 18 40 L23 34" stroke-width="4"/>'
                f'<polygon points="24,30 26,40 17,36" {F}/>',
     'cooking': '<path d="M10 26 H54" stroke-width="4"/><path d="M14 26 L18 46 Q32 54 46 46 L50 26"/>'
@@ -129,8 +132,10 @@ ICONS = {
                   '<path d="M40 50 C36 42 40 30 46 30 C52 30 52 42 48 50 Z" opacity="0.55"/><circle cx="44" cy="56" r="4" opacity="0.55"/></g>',
     'keeneye': '<path d="M6 32 Q32 10 58 32 Q32 54 6 32 Z"/>'
                f'<circle cx="32" cy="32" r="9" {F}/><circle cx="32" cy="32" r="3.5" {K}/><path d="M32 4 V12 M32 52 V60" stroke-width="3"/>',
-    'ghost': '<path d="M16 56 V28 A16 16 0 0 1 48 28 V56 L42 50 L37 56 L32 50 L27 56 L22 50 Z"/>'
-             f'<circle cx="26" cy="30" r="3.5" {F}/><circle cx="38" cy="30" r="3.5" {F}/>',
+    'ghost': f'<path d="M16 50 V28 C16 14 24 6 32 6 C40 6 48 14 48 28 V50 Z" {F}/>'
+             f'<path d="M22 30 C22 22 26 18 32 18 C38 18 42 22 42 30 V36 H22 Z" {K}/>'
+             f'<circle cx="27" cy="29" r="2.5" {F}/><circle cx="37" cy="29" r="2.5" {F}/>'
+             '<path d="M12 54 H24 M28 58 H40 M44 54 H54" stroke-width="3" stroke-dasharray="4 3"/>',
     'lonewolf': f'<path d="M12 10 L22 24 L32 20 L42 24 L52 10 L50 32 C50 44 42 54 32 58 C22 54 14 44 14 32 Z" {F}/>'
                 f'<path d="M22 34 L28 36 M42 34 L36 36" stroke="#000" stroke-width="3"/><path d="M28 46 L32 50 L36 46" stroke="#000" stroke-width="2.5"/>',
     'vigor': f'<path d="M32 56 C10 40 6 28 12 18 C18 8 30 12 32 20 C34 12 46 8 52 18 C58 28 54 40 32 56 Z" {F}/>'
@@ -147,8 +152,10 @@ ICONS = {
                 '<path d="M6 52 q6 -6 12 0 t12 0 t12 0 t12 0" stroke-width="3"/>',
     'springstep': '<path d="M20 56 L44 50 L20 44 L44 38 L20 32 L44 26" stroke-width="3.5"/>'
                   f'<path d="M32 22 V6" stroke-width="3.5"/><polygon points="32,2 39,12 25,12" {F}/>',
-    'windrunner': f'<path d="M8 40 C20 40 30 30 36 16 C40 30 48 36 58 36 C48 44 30 48 8 40 Z" {F}/>'
-                  '<path d="M6 50 H30 M14 58 H36" stroke-width="3"/>',
+    'windrunner': '<path d="M6 20 H34 C42 20 44 12 38 10" stroke-width="3.5"/>'
+                  '<path d="M6 32 H46 C56 32 58 42 50 44" stroke-width="3.5"/>'
+                  '<path d="M6 44 H28 C36 44 38 52 32 54" stroke-width="3.5"/>'
+                  f'<polygon points="52,14 56,20 60,14 56,8" {F}/>',
     'endlessroad': '<path d="M26 8 L6 58 M38 8 L58 58" stroke-width="3.5"/>'
                    '<path d="M32 14 V20 M32 28 V36 M32 44 V54" stroke-width="3.5"/><circle cx="32" cy="6" r="3"/>',
     'quickstudy': f'<path d="M32 16 C24 10 14 10 8 12 V52 C14 50 24 50 32 56 C40 50 50 50 56 52 V12 C50 10 40 10 32 16 Z"/>'

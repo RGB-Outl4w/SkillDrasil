@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+- Compatibility: skills added by other mods are no longer frozen at 0. They keep vanilla levelling, death loss and effects, and are listed under the new **Other skills** button.
+- `Balance.PerkStrength` (server-synced, 0–3, default 1) scales every perk and keystone bonus; drawbacks stay fixed.
+- Cursor tooltip on tree nodes: name, rank and what's needed to learn it.
+- HUD hint while you have unspent points (`Client.ShowPointsHint`).
+- Learning a node plays the level-up flash and sound.
+- Redrawn icons: Polearms, Fists, Wood Cutting, Ghost, Windrunner.
+
 ## 0.3.0
 - Deeper trees: every branch now has two perks per tier (15 new perks) and a **keystone** at 15 points spent.
 - Keystones: Bear Shirt, Lone Wolf, Völva's Oath, Endless Road, Homesteader. Big bonus, real drawback, only one in the whole tree. The Rune of Forgetting frees the choice.
