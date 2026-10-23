@@ -4,7 +4,7 @@ A Valheim mod that replaces the vanilla skill system with a skill tree.
 
 **Website:** https://rgb-outl4w.github.io/SkillDrasil/ (English / Русский)
 
-[Thunderstore](https://thunderstore.io/c/valheim/) package coming with 0.2.0 · [Changelog](CHANGELOG.md)
+**Thunderstore:** https://thunderstore.io/c/valheim/p/RGBOutl4w/SkillDrasil/ (install with r2modman / Thunderstore Mod Manager) · [Changelog](CHANGELOG.md)
 
 Vanilla: repeat an action → that skill levels up; die → lose levels.
 SkillDrasil: actions still earn XP, but into five **branches**. Full branch XP = one point you **choose** where to spend.
@@ -44,7 +44,8 @@ Balance settings (`Balance` section) are set by the server and synced to clients
 ## Install
 
 Requires [BepInExPack Valheim](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/) and [Jotunn](https://thunderstore.io/c/valheim/p/ValheimModding/Jotunn/).
-Put `SkillDrasil.dll` in `BepInEx/plugins/SkillDrasil/`.
+Easiest: install [SkillDrasil on Thunderstore](https://thunderstore.io/c/valheim/p/RGBOutl4w/SkillDrasil/) with r2modman or the Thunderstore Mod Manager; dependencies come with it.
+Manual: put `SkillDrasil.dll` in `BepInEx/plugins/SkillDrasil/`.
 
 ## Config (`BepInEx/config/rgboutl4w.skilldrasil.cfg`)
 
