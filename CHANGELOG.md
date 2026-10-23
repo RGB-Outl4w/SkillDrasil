@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Safety: branch XP ignores NaN/infinite amounts and a zero or negative point cost, so a bad config can never hang the game.
+
 ## 0.3.1
 - Compatibility: skills added by other mods are no longer frozen at 0. They keep vanilla levelling, death loss and effects, and are listed under the new **Other skills** button.
 - `Balance.PerkStrength` (server-synced, 0–3, default 1) scales every perk and keystone bonus; drawbacks stay fixed.

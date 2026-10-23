@@ -20,6 +20,12 @@ static class Program
         Check(s.AddXp(Branch.Warrior, 26f, 10f, (float)Math.Log(1.5, 2)) == 2, "two points from 26 xp");
         Check(Math.Abs(s.Xp[0] - 1f) < 1e-3, "leftover xp");
 
+        // Guard: bad config or bad XP never hangs the game.
+        var g = new TreeState();
+        Check(g.AddXp(Branch.Artisan, 50f, 0f, 1.5f) == 0, "zero first-point cost awards nothing, no hang");
+        Check(g.AddXp(Branch.Artisan, float.PositiveInfinity, 80f, 1.5f) == 0 && !float.IsInfinity(g.Xp[4]), "infinite xp ignored");
+        Check(g.AddXp(Branch.Artisan, float.NaN, 80f, 1.5f) == 0 && !float.IsNaN(g.Xp[4]), "NaN xp ignored");
+
         // Gating: mastery rank 2 needs 2 points spent in the branch.
         Check(s.Spend("swords"), "swords rank 1");
         Check(s.CanSpend("swords", out int need) == Block.NeedSpent && need == 2, "swords rank 2 gated");

@@ -158,8 +158,10 @@ namespace SkillDrasil
         public int AddXp(Branch b, float amount, float firstXp, float exponent)
         {
             int i = (int)b, gained = 0;
+            if (float.IsNaN(amount) || float.IsInfinity(amount) || amount <= 0f) return 0;
             Xp[i] += amount;
-            for (float cost; Xp[i] >= (cost = PointCost(Earned[i], firstXp, exponent)); gained++)
+            // A zero/negative/NaN cost (bad config) would never stop the loop; refuse to award points instead.
+            for (float cost; (cost = PointCost(Earned[i], firstXp, exponent)) > 0f && !float.IsInfinity(cost) && Xp[i] >= cost; gained++)
             {
                 Xp[i] -= cost;
                 Earned[i]++;
