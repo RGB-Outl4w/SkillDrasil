@@ -47,12 +47,15 @@ namespace SkillDrasil
 
         public static bool Severed(Player p) => p.GetSEMan().HaveStatusEffect(Perks.SeveredHash);
 
-        public static bool PerkActive(string id)
+        public static bool PerkActive(string id) => PerkRank(id) > 0;
+
+        // Learned rank of a perk, 0 while Severed Roots silences tier 3 perks and keystones.
+        public static int PerkRank(string id)
         {
             var p = Player.m_localPlayer;
             var s = For(p);
-            if (s == null || s.Rank(id) == 0) return false;
-            return TreeDef.ById[id].Tier < 3 || !Severed(p);
+            int rank = s?.Rank(id) ?? 0;
+            return rank > 0 && TreeDef.ById[id].Tier >= 3 && Severed(p) ? 0 : rank;
         }
 
         public static void Save(Player p)

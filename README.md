@@ -11,19 +11,20 @@ SkillDrasil: actions still earn XP, but into five **branches**. Full branch XP =
 
 ## How it works
 
-| Branch | Masteries (vanilla skills) | Perks (tier 1 / 2 / 3) |
-|---|---|---|
-| Warrior | Swords, Axes, Clubs, Polearms, Spears, Unarmed, Blocking | Shield-Wall, Berserkgang, Riposte |
-| Hunter | Bows, Crossbows, Knives, Sneak | Silent Death, Steady Aim, Fletcher's Luck |
-| Seiðr | Elemental Magic, Blood Magic | Eitr Well, Focused Mind, Arcane Surge |
-| Wanderer | Run, Jump, Swim, Dodge, Ride | Fleetfoot, Second Wind, Featherfall |
-| Artisan | Pickaxes, Wood Cutting, Fishing, Cooking, Farming, Crafting | Deep Pockets, Builder's Ease, Hearthkeeper |
+| Branch | Masteries (vanilla skills) | Perks (tier 1 · 2 · 3) | Keystone |
+|---|---|---|---|
+| Warrior | Swords, Axes, Clubs, Polearms, Spears, Unarmed, Blocking | Shield-Wall, Iron Hide · Berserkgang, Battle Fervor · Riposte, Unshaken | Bear Shirt |
+| Hunter | Bows, Crossbows, Knives, Sneak | Silent Death, Shadowstep · Steady Aim, Keen Eye · Fletcher's Luck, Ghost | Lone Wolf |
+| Seiðr | Elemental Magic, Blood Magic | Eitr Well, Völva's Vigor · Focused Mind, Galdr · Arcane Surge, Rune Ward | Völva's Oath |
+| Wanderer | Run, Jump, Swim, Dodge, Ride | Fleetfoot, Seal-Born · Second Wind, Spring Step · Featherfall, Windrunner | Endless Road |
+| Artisan | Pickaxes, Wood Cutting, Fishing, Cooking, Farming, Crafting | Deep Pockets, Quick Study · Builder's Ease, Miner's Grit · Hearthkeeper, Hard Worker | Homesteader |
 
 - **Masteries** have 5 ranks. Each rank = 20 levels of that vanilla skill, so all vanilla skill effects still apply. Gear and mead skill bonuses still stack on top.
-- **Perks** add new effects. Tier N needs 3×N points already spent in the branch. Mastery rank R needs 2×(R−1).
+- **Perks** add new effects, two per tier. Tier N needs 3×N points already spent in the branch; some perks have 2–3 ranks. Mastery rank R needs 2×(R−1).
+- **Keystones** need 15 points in their branch: a big build-defining bonus with a drawback. Only **one keystone** in the whole tree, so pick your identity (the Rune of Forgetting lets you choose again).
 - **Branch points** come from using that branch's skills and are spent in that branch.
 - **Free points** (spend anywhere) come from milestones: each boss defeated in the world, each new biome discovered.
-- **Death** (when vanilla would drain skills): lose part of every branch's in-progress XP. Spent points are never lost. You respawn with **Severed Roots** for 10 minutes: masteries count one rank lower and tier 3 perks are off. The "Death skills reset" world modifier wipes branch points instead (free points kept).
+- **Death** (when vanilla would drain skills): lose part of every branch's in-progress XP. Spent points are never lost. You respawn with **Severed Roots** for 10 minutes: masteries count one rank lower, tier 3 perks and your keystone are off. The "Death skills reset" world modifier wipes branch points instead (free points kept).
 - **Respec**: craft a **Rune of Forgetting** at the workbench (10 Stone, 10 Resin, 5 Greydwarf Eye) and consume it.
 - Open the tree with **K** (configurable) or the inventory's Skills button.
 
@@ -50,7 +51,7 @@ Manual: put `SkillDrasil.dll` in `BepInEx/plugins/SkillDrasil/`.
 ## Config (`BepInEx/config/rgboutl4w.skilldrasil.cfg`)
 
 | Key | Default | |
-|---|---|---|
+|---|---|---|---|
 | Progression.FirstPointXp | 80 | Branch XP for the first point; point n costs `FirstPointXp × n^CostExponent` (server-synced) |
 | Progression.CostExponent | 1.5 | 1 = linear, 1.5 = vanilla-like. About 57k XP for 20 points in one branch (server-synced) |
 | Balance.SeveredRootsSeconds | 600 | Debuff duration (server-synced) |

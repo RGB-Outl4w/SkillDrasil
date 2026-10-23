@@ -67,7 +67,33 @@ static class Program
             progress = false;
             foreach (var n in TreeDef.Nodes) progress |= all.Spend(n.Id);
         }
-        Check(TreeDef.Nodes.All(n => all.Rank(n.Id) == n.MaxRank), "all nodes reachable");
+        Check(TreeDef.Nodes.Where(n => !n.IsKeystone).All(n => all.Rank(n.Id) == n.MaxRank), "all non-keystone nodes reachable");
+
+        // Keystones: exactly one in the whole tree, each reachable on its own, freed by respec.
+        Check(TreeDef.Nodes.Count(n => n.IsKeystone && all.Rank(n.Id) > 0) == 1, "only one keystone");
+        Check(all.CanSpend("lonewolf") == Block.KeystoneTaken || all.Keystone == "lonewolf", "second keystone blocked");
+        foreach (var k in TreeDef.Nodes.Where(n => n.IsKeystone))
+        {
+            var solo = new TreeState { FreeEarned = 1000 };
+            for (bool progress = true; progress;)
+            {
+                progress = false;
+                foreach (var n in TreeDef.Nodes.Where(n => n.Branch == k.Branch && !n.IsKeystone)) progress |= solo.Spend(n.Id);
+            }
+            Check(solo.Spend(k.Id) && solo.Keystone == k.Id, "keystone reachable: " + k.Id);
+        }
+        all.Respec();
+        Check(all.Keystone == null, "respec frees keystone");
+
+        // Keystone gate: 15 points in its branch.
+        var gate = new TreeState { FreeEarned = 100 };
+        for (int i = 0; i < 5; i++) gate.Spend("swords");
+        for (int i = 0; i < 5; i++) gate.Spend("axes");
+        Check(gate.CanSpend("bearshirt", out int kneed) == Block.NeedSpent && kneed == 15, "keystone needs 15 spent");
+
+        // Multi-rank perks keep ranks through a save round trip.
+        Check(gate.Spend("ironhide") && gate.Spend("ironhide") && TreeState.Parse(gate.Serialize()).Rank("ironhide") == 2, "multi-rank perk");
+        Check(TreeDef.Nodes.Length == 59 && TreeDef.Nodes.Count(n => n.IsKeystone) == 5, "node count");
 
 
         // Update check version compare.

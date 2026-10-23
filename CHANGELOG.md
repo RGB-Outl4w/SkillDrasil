@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+- Deeper trees: every branch now has two perks per tier (15 new perks) and a **keystone** at 15 points spent.
+- Keystones: Bear Shirt, Lone Wolf, Völva's Oath, Endless Road, Homesteader. Big bonus, real drawback, only one in the whole tree. The Rune of Forgetting frees the choice.
+- Multi-rank perks: Iron Hide, Battle Fervor, Shadowstep, Keen Eye, Völva's Vigor, Galdr, Seal-Born, Spring Step, Quick Study, Miner's Grit (2–3 ranks).
+- Severed Roots now also silences your keystone.
+- New icons for every new node; English and Russian text.
+- Saves from 0.2 load unchanged (new nodes start unlearned). Multiplayer: everyone needs 0.3.x.
+
 ## 0.2.0
 - First Thunderstore release.
 - MIT license.

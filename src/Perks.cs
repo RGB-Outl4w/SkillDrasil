@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using Jotunn.Configs;
 using Jotunn.Entities;
@@ -64,6 +65,18 @@ namespace SkillDrasil
     {
         // Only ever added to the local player (Tree.Tick), and PerkActive reads the local tree.
         static bool On(string id) => Tree.PerkActive(id);
+        static int Rank(string id) => Tree.PerkRank(id);
+
+        static readonly List<HitData.DamageModPair> runeWard = new List<HitData.DamageModPair>
+        {
+            new HitData.DamageModPair { m_type = HitData.DamageType.Fire, m_modifier = HitData.DamageModifier.Resistant },
+            new HitData.DamageModPair { m_type = HitData.DamageType.Frost, m_modifier = HitData.DamageModifier.Resistant },
+            new HitData.DamageModPair { m_type = HitData.DamageType.Lightning, m_modifier = HitData.DamageModifier.Resistant },
+        };
+
+        static bool IsMagic(SkillType s) => s == SkillType.ElementalMagic || s == SkillType.BloodMagic;
+        static bool IsRanged(SkillType s) => s == SkillType.Bows || s == SkillType.Crossbows;
+        SkillType Weapon => (m_character as Humanoid)?.GetCurrentWeapon()?.m_shared.m_skillType ?? SkillType.None;
 
         static bool IsMelee(SkillType s) =>
             s == SkillType.Swords || s == SkillType.Axes || s == SkillType.Clubs || s == SkillType.Polearms ||
@@ -76,7 +89,87 @@ namespace SkillDrasil
             if (On("berserkgang") && IsMelee(skill) && p.GetHealthPercentage() < 0.3f) hit.m_damage.Modify(1.2f);
             if (On("silentdeath")) hit.m_backstabBonus *= 1.5f;
             if (On("steadyaim") && (skill == SkillType.Bows || skill == SkillType.Crossbows) && p.IsCrouching()) hit.m_damage.Modify(1.15f);
-            if (On("arcanesurge") && (skill == SkillType.ElementalMagic || skill == SkillType.BloodMagic)) hit.m_damage.Modify(1.15f);
+            if (On("arcanesurge") && IsMagic(skill)) hit.m_damage.Modify(1.15f);
+            if (IsRanged(skill) && Rank("keeneye") > 0) hit.m_damage.Modify(1f + 0.05f * Rank("keeneye"));
+            if (IsMagic(skill) && Rank("galdr") > 0) hit.m_damage.Modify(1f + 0.05f * Rank("galdr"));
+
+            // Keystones
+            if (On("bearshirt") && IsMelee(skill)) hit.m_damage.Modify(1.3f);
+            if (On("lonewolf")) hit.m_damage.Modify(IsRanged(skill) || skill == SkillType.Knives ? 1.3f : IsMelee(skill) ? 0.7f : 1f);
+            if (On("volvasoath")) hit.m_damage.Modify(IsMagic(skill) ? 1.3f : 0.7f);
+        }
+
+        // Incoming hits, on the owner's machine before armor and resistances.
+        public override void OnDamaged(HitData hit, Character attacker)
+        {
+            if (On("homesteader")) hit.ApplyModifier(1.25f);
+        }
+
+        public override void ModifyArmorMods(ref float armor)
+        {
+            armor += 3f * Rank("ironhide");
+            if (On("bearshirt")) armor *= 0.6f;
+        }
+
+        public override void ModifyAttackStaminaUsage(float baseStaminaUse, ref float staminaUse)
+        {
+            var w = Weapon;
+            if (IsMelee(w)) staminaUse *= 1f - 0.1f * Rank("battlefervor");
+            if (w == SkillType.Pickaxes) staminaUse *= 1f - 0.15f * Rank("minersgrit");
+        }
+
+        public override void ModifyStagger(float baseValue, ref float use)
+        {
+            if (On("unshaken")) use *= 0.6f;
+        }
+
+        public override void ModifySneakStaminaUsage(float baseStaminaUse, ref float staminaUse)
+        {
+            staminaUse *= 1f - 0.2f * Rank("shadowstep");
+        }
+
+        // Lower stealth factor = harder to notice.
+        public override void ModifyStealth(float baseStealth, ref float stealth)
+        {
+            if (On("ghost")) stealth *= 0.5f;
+        }
+
+        public override void ModifyHealthRegen(ref float regenMultiplier)
+        {
+            regenMultiplier += 0.15f * Rank("vigor");
+        }
+
+        public override void ModifyDamageMods(ref HitData.DamageModifiers modifiers)
+        {
+            if (On("runeward")) modifiers.Apply(runeWard);
+        }
+
+        public override void ModifySwimStaminaUsage(float baseStaminaUse, ref float staminaUse)
+        {
+            staminaUse *= 1f - 0.2f * Rank("sealborn");
+        }
+
+        public override void ModifyJumpStaminaUsage(float baseStaminaUse, ref float staminaUse)
+        {
+            staminaUse *= 1f - 0.1f * Rank("springstep");
+        }
+
+        public override void ModifySpeed(float baseSpeed, ref float speed, Character character, Vector3 dir)
+        {
+            if (On("windrunner") && !character.IsSwimming()) speed += baseSpeed * 0.08f;
+        }
+
+        public override void ModifyStaminaRegen(ref float staminaRegen)
+        {
+            if (On("hardworker")) staminaRegen += 0.15f;
+            if (On("endlessroad")) staminaRegen += 0.4f;
+        }
+
+        // Feeds branch XP: Player.RaiseSkill multiplies the raise by this before SkillDrasil sees it.
+        public override void ModifyRaiseSkill(SkillType skill, ref float value)
+        {
+            value += 0.05f * Rank("quickstudy");
+            if (On("homesteader")) value += 0.25f;
         }
 
         public override void ModifyBlockStaminaUsage(float baseStaminaUse, ref float staminaUse)
@@ -92,6 +185,7 @@ namespace SkillDrasil
         public override void ModifyEitrRegen(ref float eitrRegen)
         {
             if (On("eitrwell")) eitrRegen *= 1.25f;
+            if (On("volvasoath")) eitrRegen *= 1.25f;
         }
 
         public override void ModifyRunStaminaDrain(float baseDrain, ref float drain, Vector3 dir)
@@ -112,6 +206,8 @@ namespace SkillDrasil
         public override void ModifyMaxCarryWeight(float baseLimit, ref float limit)
         {
             if (On("deeppockets")) limit += 50f;
+            if (On("homesteader")) limit += 100f;
+            if (On("endlessroad")) limit -= 100f;
         }
 
         public override void ModifyHomeItemStaminaUsage(float baseStaminaUse, ref float staminaUse)

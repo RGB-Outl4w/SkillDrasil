@@ -115,6 +115,50 @@ ICONS = {
                     '<rect x="44" y="46" width="14" height="9" rx="4"/></g>'
                     '<path d="M14 42 L24 36 M50 42 L40 36" stroke-width="3"/>',
     # Branch tabs
+    # 0.3 perks
+    'ironhide': '<path d="M18 10 L32 6 L46 10 L54 22 L48 26 V56 H16 V26 L10 22 Z"/>'
+                '<path d="M22 30 H42 M22 38 H42 M22 46 H42" stroke-width="2.5" stroke-dasharray="3 3"/>',
+    'battlefervor': f'<path d="M14 50 L46 18" stroke-width="4.5"/><path d="M10 46 L18 54" stroke-width="4"/>'
+                    f'<path d="M44 34 C50 26 56 24 54 14 C50 20 46 18 46 10 C40 16 38 24 44 34 Z" {F}/>',
+    'unshaken': f'<path d="M32 58 V30" stroke-width="5"/><circle cx="32" cy="22" r="15" {F}/>'
+                '<path d="M32 50 C24 54 16 54 10 58 M32 50 C40 54 48 54 54 58" stroke-width="3.5"/>',
+    'bearshirt': f'<ellipse cx="32" cy="42" rx="14" ry="12" {F}/>'
+                 f'<g {F}><ellipse cx="14" cy="24" rx="5" ry="7"/><ellipse cx="25" cy="15" rx="5" ry="7"/>'
+                 '<ellipse cx="39" cy="15" rx="5" ry="7"/><ellipse cx="50" cy="24" rx="5" ry="7"/></g>',
+    'shadowstep': f'<g {F}><path d="M18 34 C14 26 18 14 24 14 C30 14 30 26 26 34 Z"/><circle cx="22" cy="40" r="4"/>'
+                  '<path d="M40 50 C36 42 40 30 46 30 C52 30 52 42 48 50 Z" opacity="0.55"/><circle cx="44" cy="56" r="4" opacity="0.55"/></g>',
+    'keeneye': '<path d="M6 32 Q32 10 58 32 Q32 54 6 32 Z"/>'
+               f'<circle cx="32" cy="32" r="9" {F}/><circle cx="32" cy="32" r="3.5" {K}/><path d="M32 4 V12 M32 52 V60" stroke-width="3"/>',
+    'ghost': '<path d="M16 56 V28 A16 16 0 0 1 48 28 V56 L42 50 L37 56 L32 50 L27 56 L22 50 Z"/>'
+             f'<circle cx="26" cy="30" r="3.5" {F}/><circle cx="38" cy="30" r="3.5" {F}/>',
+    'lonewolf': f'<path d="M12 10 L22 24 L32 20 L42 24 L52 10 L50 32 C50 44 42 54 32 58 C22 54 14 44 14 32 Z" {F}/>'
+                f'<path d="M22 34 L28 36 M42 34 L36 36" stroke="#000" stroke-width="3"/><path d="M28 46 L32 50 L36 46" stroke="#000" stroke-width="2.5"/>',
+    'vigor': f'<path d="M32 56 C10 40 6 28 12 18 C18 8 30 12 32 20 C34 12 46 8 52 18 C58 28 54 40 32 56 Z" {F}/>'
+             '<path d="M32 22 V44 M32 30 L24 24 M32 30 L40 24" stroke="#000" stroke-width="3"/>',
+    'galdr': '<path d="M8 32 Q14 20 20 32 T32 32 T44 32 T56 32" stroke-width="3"/>'
+             '<path d="M8 44 Q14 32 20 44 T32 44 T44 44 T56 44" stroke-width="2" opacity="0.6"/>'
+             '<path d="M26 8 V22 M26 8 L34 14 L26 18" stroke-width="3"/>',
+    'runeward': '<path d="M32 6 L54 14 V30 C54 44 44 54 32 58 C20 54 10 44 10 30 V14 Z"/>'
+                '<path d="M32 18 V46 M32 26 L24 34 M32 26 L40 34" stroke-width="3.5"/>',
+    'volvasoath': f'<path d="M32 60 V22" stroke-width="4"/><circle cx="32" cy="14" r="8"/>'
+                  f'<circle cx="32" cy="14" r="3" {F}/><path d="M22 24 C26 28 38 28 42 24" stroke-width="3"/>'
+                  '<path d="M18 8 L22 12 M46 8 L42 12 M14 18 H20 M44 18 H50" stroke-width="2.5"/>',
+    'sealborn': f'<path d="M10 40 C12 26 30 20 44 24 C52 26 56 22 58 18 C58 28 54 34 48 36 C40 40 24 44 10 40 Z" {F}/>'
+                '<path d="M6 52 q6 -6 12 0 t12 0 t12 0 t12 0" stroke-width="3"/>',
+    'springstep': '<path d="M20 56 L44 50 L20 44 L44 38 L20 32 L44 26" stroke-width="3.5"/>'
+                  f'<path d="M32 22 V6" stroke-width="3.5"/><polygon points="32,2 39,12 25,12" {F}/>',
+    'windrunner': f'<path d="M8 40 C20 40 30 30 36 16 C40 30 48 36 58 36 C48 44 30 48 8 40 Z" {F}/>'
+                  '<path d="M6 50 H30 M14 58 H36" stroke-width="3"/>',
+    'endlessroad': '<path d="M26 8 L6 58 M38 8 L58 58" stroke-width="3.5"/>'
+                   '<path d="M32 14 V20 M32 28 V36 M32 44 V54" stroke-width="3.5"/><circle cx="32" cy="6" r="3"/>',
+    'quickstudy': f'<path d="M32 16 C24 10 14 10 8 12 V52 C14 50 24 50 32 56 C40 50 50 50 56 52 V12 C50 10 40 10 32 16 Z"/>'
+                  '<path d="M32 16 V56" stroke-width="2.5"/><path d="M14 22 H26 M14 30 H26 M38 22 H50 M38 30 H50" stroke-width="2"/>',
+    'minersgrit': '<path d="M8 22 Q28 6 48 22" stroke-width="5"/><path d="M28 14 V58" stroke-width="4.5"/>'
+                  f'<polygon points="50,34 52,40 58,42 52,44 50,50 48,44 42,42 48,40" {F}/>',
+    'hardworker': f'<path d="M14 54 V40 C14 32 20 28 26 30 L30 22 C32 18 38 18 40 22 L40 30 C48 30 52 36 50 44 L46 54 Z" {F}/>'
+                  f'<path d="M48 6 C52 12 54 14 54 17 A4 4 0 0 1 46 17 C46 14 46 12 48 6 Z" {F}/>',
+    'homesteader': '<path d="M6 34 L32 12 L58 34" stroke-width="4"/><path d="M12 30 V56 H52 V30"/>'
+                   f'<rect x="27" y="40" width="10" height="16" {F}/><path d="M20 12 L14 4 M44 12 L50 4" stroke-width="3"/>',
     'branch_warrior': f'<path d="M12 36 A20 20 0 0 1 52 36 Z" {F}/><path d="M8 37 H56" stroke-width="4"/>'
                       '<path d="M32 37 V54" stroke-width="5"/><path d="M14 40 Q14 52 24 54 M50 40 Q50 52 40 54"/>',
     'branch_hunter': '<path d="M32 58 V30"/>'

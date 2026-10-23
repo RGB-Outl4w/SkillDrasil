@@ -23,8 +23,9 @@ namespace SkillDrasil
         static readonly Color Bad = new Color(1f, 0.45f, 0.4f, 1f);
         static readonly Color Shade = new Color(0f, 0f, 0f, 0.4f);
 
-        // Trunk geometry inside the tree canvas: perk tier t sits where 3t points have been spent.
-        const float TrunkBase = -120f, TrunkTop = 140f, MaxGate = 9f;
+        // Trunk geometry inside the tree canvas: the trunk fills from 0 to 15 points spent;
+        // perk tier t branches off where 3t points are spent, the keystone crowns it at 15.
+        const float TrunkBase = -140f, TrunkTop = 180f, MaxGate = Node.KeystoneSpent;
 
         class NodeView
         {
@@ -245,20 +246,38 @@ namespace SkillDrasil
             Img(c, new Vector2(0f, (TrunkBase + TrunkTop) / 2f), new Vector2(16f, TrunkTop - TrunkBase), Bark);
             trunkFill = Img(c, basePoint, new Vector2(8f, 0f), Sap).rectTransform;
             trunkFill.pivot = new Vector2(0.5f, 0f);
-            var perkPos = new[] { new Vector2(-215f, GateY(1)), new Vector2(215f, GateY(2)), new Vector2(0f, 218f) };
-            for (int t = 1; t <= 3; t++)
+            // Two perks per tier, left and right of the trunk; tier 2 reaches further out so labels never collide.
+            var perkPos = new Dictionary<string, Vector2>();
+            foreach (var tier in perks.GroupBy(n => n.Tier))
             {
-                var gate = new Vector2(0f, GateY(t));
-                Line(c, gate, perkPos[t - 1], 8f, Bark);
+                var n0 = tier.First();
+                float y = GateY(n0.RequiredSpent(1));
+                var gate = new Vector2(0f, y);
+                if (n0.IsKeystone)
+                {
+                    perkPos[n0.Id] = new Vector2(0f, y + 46f);
+                    Line(c, gate, perkPos[n0.Id], 8f, Bark);
+                }
+                else
+                {
+                    float x = n0.Tier == 2 ? 255f : 130f;
+                    int side = -1;
+                    foreach (var n in tier)
+                    {
+                        perkPos[n.Id] = new Vector2(side * x, y);
+                        Line(c, gate, perkPos[n.Id], 8f, Bark);
+                        side = -side;
+                    }
+                }
                 Img(c, gate, new Vector2(26f, 6f), Pale);
-                Label(c, $"{t * 3}", gate + new Vector2(t == 2 ? -30f : 30f, t == 3 ? -12f : 0f), 40f, 22f, 15, Pale);
+                Label(c, $"{n0.RequiredSpent(1)}", gate + new Vector2(n0.IsKeystone ? 30f : -26f, n0.IsKeystone ? -14f : 14f), 40f, 22f, 15, Pale);
             }
 
-            for (int i = 0; i < masteries.Length; i++) views[masteries[i].Id] = BuildNode(c, masteries[i], rootPos[i], 64f);
-            for (int i = 0; i < perks.Length; i++) views[perks[i].Id] = BuildNode(c, perks[i], perkPos[i], 78f);
+            for (int i = 0; i < masteries.Length; i++) views[masteries[i].Id] = BuildNode(c, masteries[i], rootPos[i], 62f);
+            foreach (var n in perks) views[n.Id] = BuildNode(c, n, perkPos[n.Id], n.IsKeystone ? 78f : 64f);
         }
 
-        static float GateY(int tier) => TrunkBase + (TrunkTop - TrunkBase) * Mathf.Min(1f, tier * 3f / MaxGate);
+        static float GateY(int spent) => TrunkBase + (TrunkTop - TrunkBase) * Mathf.Min(1f, spent / MaxGate);
 
         static NodeView BuildNode(Transform parent, Node n, Vector2 pos, float size)
         {
@@ -268,8 +287,11 @@ namespace SkillDrasil
             v.Frame = Img(v.Ring.transform, Vector2.zero, new Vector2(size, size), Color.white, FrameOf(n));
             v.Icon = Img(v.Ring.transform, Vector2.zero, new Vector2(size * 0.62f, size * 0.62f), Gold, IconOf(n));
             float below = -size / 2f - 6f;
-            if (n.IsMastery) v.Pips = Pips(v.Ring.transform, new Vector2(0f, below - 4f), n.MaxRank, 10f);
-            v.Label = Label(v.Ring.transform, L.Name(n), new Vector2(0f, below - (n.IsMastery ? 22f : 12f)), 160f, 22f, 14, Color.white);
+            bool pips = n.MaxRank > 1;
+            if (pips) v.Pips = Pips(v.Ring.transform, new Vector2(0f, below - 4f), n.MaxRank, 10f);
+            // The keystone sits at the top of the canvas, so its name goes above it.
+            var labelPos = n.IsKeystone ? new Vector2(0f, size / 2f + 16f) : new Vector2(0f, below - (pips ? 22f : 12f));
+            v.Label = Label(v.Ring.transform, L.Name(n), labelPos, 170f, 22f, n.IsKeystone ? 16 : 14, Color.white);
 
             string id = n.Id;
             On(v.Ring.gameObject, EventTriggerType.PointerEnter, () => { hovered = id; Refresh(); });
@@ -357,8 +379,10 @@ namespace SkillDrasil
             cardIcon.sprite = IconOf(n);
             cardIcon.color = rank > 0 ? Gold : block == Block.None ? Pale : Dim;
             cardName.text = L.Name(n);
-            cardKind.text = n.IsMastery ? L.T("kind_mastery", L.Branch(tab)) : L.T("kind_perk", n.Tier, L.Branch(tab));
-            foreach (var p in cardPips) p.enabled = n.IsMastery;
+            cardKind.text = n.IsMastery ? L.T("kind_mastery", L.Branch(tab))
+                : n.IsKeystone ? L.T("kind_keystone", L.Branch(tab))
+                : L.T("kind_perk", n.Tier, L.Branch(tab));
+            for (int i = 0; i < cardPips.Length; i++) cardPips[i].enabled = n.MaxRank > 1 && i < n.MaxRank;
             SetPips(cardPips, rank);
             cardEffect.text = L.Effect(n);
             cardLore.text = n.IsMastery ? SkillDescription(n.Skill) : L.Lore(n);
@@ -370,7 +394,9 @@ namespace SkillDrasil
                     ? L.T("level_max", effective * TreeDef.LevelsPerRank)
                     : L.T("level_next", effective * TreeDef.LevelsPerRank, (effective + 1) * TreeDef.LevelsPerRank, rank + 1);
             }
-            else cardNow.text = rank > 0 ? L.T(n.Tier == 3 && severed ? "learned_inactive" : "learned") : L.T("not_learned");
+            else if (rank == 0) cardNow.text = L.T("not_learned");
+            else if (n.Tier >= 3 && severed) cardNow.text = L.T("learned_inactive");
+            else cardNow.text = n.MaxRank > 1 ? L.T("rank_of", rank, n.MaxRank) : L.T("learned");
 
             cardReq.text = block == Block.Maxed ? "" : L.Reason(block, need, n.Branch);
             cardReq.color = block == Block.None ? Good : Bad;

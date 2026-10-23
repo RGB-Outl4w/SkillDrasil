@@ -20,7 +20,7 @@ namespace SkillDrasil
     {
         public const string Guid = "rgboutl4w.skilldrasil";
         public const string ModName = "SkillDrasil";
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
         const string ReleasesApi = "https://api.github.com/repos/RGB-Outl4w/SkillDrasil/releases/latest";
         const string ReleasesPage = "https://github.com/RGB-Outl4w/SkillDrasil/releases/latest";
 
