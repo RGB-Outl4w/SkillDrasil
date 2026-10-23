@@ -1,8 +1,8 @@
 {
   "name": "SkillDrasil",
-  "version_number": "0.1.1",
-  "website_url": "https://github.com/RGB-Outl4w/SkillDrasil",
-  "description": "Replaces vanilla skills with a skill tree: branch XP, chosen masteries and perks, softer death. Save-safe install and uninstall.",
+  "version_number": "0.2.0",
+  "website_url": "https://rgb-outl4w.github.io/SkillDrasil/",
+  "description": "Replaces vanilla skills with a skill tree: five branches, masteries and perks you choose, softer death. Save-safe. English & Russian.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2333",
     "ValheimModding-Jotunn-2.30.2"
