@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.3.2
+- **Active abilities**, one per branch, unlocked by a tier 1 perk of that branch:
+  War Cry (you and allies: +20% damage, 15 s), Hunter's Mark (enemies take +25% damage from everyone, 15 s),
+  Völva's Chant (30 eitr: you and allies heal 40% over 10 s), Gale Step (+50% stamina, +20% speed, 8 s),
+  Tireless Toil (no stamina for chopping, mining, building, repairing, 30 s).
+  Cast with Alt + 1–5 (configurable); while Alt is held, number keys don't use the hotbar. Cooldowns show bottom right.
+- Faster progression: point n now costs `60 × n^1.25` XP (was `80 × n^1.5`): about 5,300 XP for 10 points and 24,000 for 20 (was 10,000 and 57,000). Config files still on the old defaults are updated automatically; custom values are kept.
 - Safety: branch XP ignores NaN/infinite amounts and a zero or negative point cost, so a bad config can never hang the game.
 
 ## 0.3.1

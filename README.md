@@ -21,6 +21,7 @@ SkillDrasil: actions still earn XP, but into five **branches**. Full branch XP =
 
 - **Masteries** have 5 ranks. Each rank = 20 levels of that vanilla skill, so all vanilla skill effects still apply. Gear and mead skill bonuses still stack on top.
 - **Perks** add new effects, two per tier. Tier N needs 3×N points already spent in the branch; some perks have 2–3 ranks. Mastery rank R needs 2×(R−1).
+- **Active abilities**: one per branch (War Cry, Hunter's Mark, Völva's Chant, Gale Step, Tireless Toil), unlocked once you know a tier 1 perk of that branch. Cast with **Alt + 1–5**; cooldowns show bottom right. Effects on allies and enemies sync in multiplayer.
 - **Keystones** need 15 points in their branch: a big build-defining bonus with a drawback. Only **one keystone** in the whole tree, so pick your identity (the Rune of Forgetting lets you choose again).
 - **Branch points** come from using that branch's skills and are spent in that branch.
 - **Free points** (spend anywhere) come from milestones: each boss defeated in the world, each new biome discovered.
@@ -52,12 +53,14 @@ Manual: put `SkillDrasil.dll` in `BepInEx/plugins/SkillDrasil/`.
 
 | Key | Default | |
 |---|---|---|---|
-| Progression.FirstPointXp | 80 | Branch XP for the first point; point n costs `FirstPointXp × n^CostExponent` (server-synced) |
-| Progression.CostExponent | 1.5 | 1 = linear, 1.5 = vanilla-like. About 57k XP for 20 points in one branch (server-synced) |
+| Progression.FirstPointXp | 60 | Branch XP for the first point; point n costs `FirstPointXp × n^CostExponent` (server-synced) |
+| Progression.CostExponent | 1.25 | 1 = linear, 1.5 = vanilla-like (slow). About 24k XP for 20 points in one branch (server-synced) |
 | Balance.SeveredRootsSeconds | 600 | Debuff duration (server-synced) |
 | Balance.PerkStrength | 1 | Scales every perk and keystone bonus, 0–3; drawbacks stay fixed (server-synced) |
 | Client.OpenTreeKey | K | |
 | Client.ShowPointsHint | true | HUD hint while you have unspent points |
+| Abilities.Modifier | LeftAlt | Hold and press an ability key to cast; number keys skip the hotbar while held |
+| Abilities.KeyWarrior … KeyArtisan | 1 … 5 | Ability key per branch |
 | Client.CheckForUpdates | true | On the main menu, ask GitHub for the latest release. Only a plain GET to `api.github.com`, nothing sent. |
 
 Console (with `devcommands`): `skilldrasil_points <n>` adds free points.

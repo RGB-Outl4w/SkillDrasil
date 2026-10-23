@@ -6,7 +6,7 @@
 <title>SkillDrasil – a skill tree for Valheim</title>
 <meta name="description" content="SkillDrasil replaces Valheim's grind-and-lose skill system with a five-branch skill tree: earn points by playing, choose masteries and perks, keep your choices when you die.">
 <meta property="og:title" content="SkillDrasil – a skill tree for Valheim">
-<meta property="og:description" content="Five branches, 24 masteries, 30 perks, 5 keystones. Your deeds feed the roots; your choices shape the branches.">
+<meta property="og:description" content="Five branches, 24 masteries, 30 perks, 5 keystones, 5 active abilities. Your deeds feed the roots; your choices shape the branches.">
 <link rel="icon" href="icons/rune.svg" type="image/svg+xml">
 <link rel="alternate" hreflang="ru" href="ru/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,6 +80,7 @@
       <div class="feature"><img src="icons/riposte.svg" alt=""><h3>Perks</h3><p>Two per tier, unlocked at 3, 6 and 9 points spent, some with several ranks: Berserkgang, Silent Death, Rune Ward, Featherfall and more.</p></div>
       <div class="feature"><img src="icons/bearshirt.svg" alt=""><h3>Keystones</h3><p>At 15 points a branch offers a keystone: a big bonus with a real drawback, like <em>Bear Shirt</em> (+30% melee, −40% armor). Only one in the whole tree: choose who you are.</p></div>
       <div class="feature"><img src="icons/branch_wanderer.svg" alt=""><h3>Free points</h3><p>Every boss felled in your world and every new biome you discover grants a free point for any branch.</p></div>
+      <div class="feature"><img src="icons/warcry.svg" alt=""><h3>Abilities</h3><p>Each branch has one active ability, unlocked once you know a tier 1 perk: War Cry, Hunter's Mark, Völva's Chant, Gale Step, Tireless Toil. Cast with <strong>Alt + 1–5</strong>; cooldowns show on your HUD.</p></div>
       <div class="feature"><img src="icons/se_severed.svg" alt=""><h3>Death</h3><p>You lose part of each branch's unspent XP, never your points. You rise with <em>Severed Roots</em> for 10 minutes: masteries one rank lower, tier 3 perks and your keystone silent.</p></div>
       <div class="feature"><img src="icons/item_rune.svg" alt=""><h3>Respec</h3><p>Craft a <em>Rune of Forgetting</em> at the workbench (10 Stone, 10 Resin, 5 Greydwarf Eye) and consume it to refund every point.</p></div>
     </div>
@@ -89,13 +90,13 @@
     <div class="two">
       <div class="panel">
         <h3>A long saga, not an evening</h3>
-        <p>Point <em>n</em> in a branch costs <code>80 × n<sup>1.5</sup></code> XP. The first points come in minutes; filling a branch takes a whole playthrough.</p>
+        <p>Point <em>n</em> in a branch costs <code>60 × n<sup>1.25</sup></code> XP. The first points come in minutes; a well-filled branch takes many evenings, not a single one.</p>
         <div class="table-scroll"><table>
           <tr><th>Point</th><th>Cost</th><th>Total so far</th></tr>
-          <tr><td>1st</td><td>80</td><td>80</td></tr>
-          <tr><td>5th</td><td>~900</td><td>~2,200</td></tr>
-          <tr><td>10th</td><td>~2,500</td><td>~10,000</td></tr>
-          <tr><td>20th</td><td>~7,200</td><td>~57,000</td></tr>
+          <tr><td>1st</td><td>60</td><td>60</td></tr>
+          <tr><td>5th</td><td>~450</td><td>~1,200</td></tr>
+          <tr><td>10th</td><td>~1,070</td><td>~5,300</td></tr>
+          <tr><td>20th</td><td>~2,540</td><td>~24,000</td></tr>
         </table></div>
       </div>
       <div class="panel">
@@ -135,11 +136,12 @@
         <p><code>BepInEx/config/rgboutl4w.skilldrasil.cfg</code></p>
         <div class="table-scroll"><table>
           <tr><th>Key</th><th>Default</th><th></th></tr>
-          <tr><td><code>FirstPointXp</code></td><td>80</td><td>XP for a branch's first point (server)</td></tr>
-          <tr><td><code>CostExponent</code></td><td>1.5</td><td>How steeply point cost grows (server)</td></tr>
+          <tr><td><code>FirstPointXp</code></td><td>60</td><td>XP for a branch's first point (server)</td></tr>
+          <tr><td><code>CostExponent</code></td><td>1.25</td><td>How steeply point cost grows (server)</td></tr>
           <tr><td><code>SeveredRootsSeconds</code></td><td>600</td><td>Debuff length after death (server)</td></tr>
           <tr><td><code>PerkStrength</code></td><td>1</td><td>Scales all perk bonuses, 0–3 (server)</td></tr>
           <tr><td><code>OpenTreeKey</code></td><td>K</td><td>Opens the tree</td></tr>
+          <tr><td><code>Modifier</code>, <code>KeyWarrior</code>…</td><td>Alt, 1–5</td><td>Ability hotkeys</td></tr>
           <tr><td><code>ShowPointsHint</code></td><td>true</td><td>HUD hint while you have points to spend</td></tr>
           <tr><td><code>CheckForUpdates</code></td><td>true</td><td>Main-menu notice when a new release is out</td></tr>
         </table></div>

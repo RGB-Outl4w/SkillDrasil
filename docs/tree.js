@@ -10,6 +10,8 @@
     mastery: { en: 'Mastery', ru: 'Мастерство' },
     perk: { en: (n) => `Tier ${n} perk`, ru: (n) => `Перк ${n}-го уровня` },
     keystone: { en: 'Keystone', ru: 'Краеугольный камень' },
+    ability: { en: 'Active ability', ru: 'Активная способность' },
+    abilityRule: { en: 'Needs a tier 1 perk of this branch. Cast with Alt + the branch number (1–5).', ru: 'Нужен перк 1-го уровня этой ветви. Применение: Alt + номер ветви (1–5).' },
     ranks: { en: (n) => `${n} ranks.`, ru: (n) => `Рангов: ${n}.` },
     keystoneRule: { en: 'Unlocks after 15 points spent in this branch. Only one keystone in the whole tree.', ru: 'Открывается после 15 очков в ветви. Камень может быть только один на всё древо.' },
     masteryEffect: { en: (s) => `+20 ${s} skill levels per rank (5 ranks, up to level 100).`, ru: (s) => `+20 к уровню навыка «${s}» за ранг (5 рангов, до уровня 100).` },
@@ -19,11 +21,14 @@
   };
 
   const M = (id, en, ru) => ({ id, name: { en, ru } });
+  const A = (id, en, ru, effEn, effRu, loreEn, loreRu) =>
+    ({ id, ability: true, name: { en, ru }, effect: { en: effEn, ru: effRu }, lore: { en: loreEn, ru: loreRu } });
   const P = (id, tier, en, ru, effEn, effRu, loreEn, loreRu, ranks = 1) =>
     ({ id, tier, ranks, name: { en, ru }, effect: { en: effEn, ru: effRu }, lore: { en: loreEn, ru: loreRu } });
 
   const BRANCHES = [
     {
+      ability: A('warcry', 'War Cry', 'Боевой клич', 'You and allies within 15 m deal 20% more damage for 15 s. Cooldown 2 min.', 'Вы и союзники в радиусе 15 м наносите на 20% больше урона 15 с. Перезарядка 2 мин.', 'One voice, and the line holds.', 'Один голос — и строй устоит.'),
       id: 'warrior', name: { en: 'Warrior', ru: 'Воин' },
       lore: { en: 'Steel, shield and the will to stand.', ru: 'Сталь, щит и воля выстоять.' },
       masteries: [M('swords', 'Swords', 'Мечи'), M('axes', 'Axes', 'Топоры'), M('clubs', 'Clubs', 'Дубины'),
@@ -40,6 +45,7 @@
       ],
     },
     {
+      ability: A('huntersmark', "Hunter's Mark", 'Метка охотника', 'Enemies within 25 m take 25% more damage from everyone for 15 s. Cooldown 90 s.', 'Враги в радиусе 25 м получают на 25% больше урона от всех 15 с. Перезарядка 90 с.', 'Point, and the pack follows.', 'Укажи — и стая последует.'),
       id: 'hunter', name: { en: 'Hunter', ru: 'Охотник' },
       lore: { en: 'Patience, silence and the clean kill.', ru: 'Терпение, тишина и точный удар.' },
       masteries: [M('bows', 'Bows', 'Луки'), M('crossbows', 'Crossbows', 'Арбалеты'), M('knives', 'Knives', 'Ножи'), M('sneak', 'Sneak', 'Скрытность')],
@@ -54,6 +60,7 @@
       ],
     },
     {
+      ability: A('volvaschant', "Völva's Chant", 'Песнь вёльвы', 'Costs 30 eitr. You and allies within 15 m regain 40% health over 10 s. Cooldown 2 min.', 'Стоит 30 эйтра. Вы и союзники в радиусе 15 м восстанавливаете 40% здоровья за 10 с. Перезарядка 2 мин.', 'The old songs mend what steel has torn.', 'Старые песни лечат то, что порвала сталь.'),
       id: 'seidr', name: { en: 'Seiðr', ru: 'Сейд' },
       lore: { en: 'The eitr-craft of the völva.', ru: 'Колдовство эйтра, искусство вёльвы.' },
       masteries: [M('elementalmagic', 'Elemental Magic', 'Магия стихий'), M('bloodmagic', 'Blood Magic', 'Магия крови')],
@@ -68,6 +75,7 @@
       ],
     },
     {
+      ability: A('galestep', 'Gale Step', 'Шаг бури', 'Restore 50% stamina and move 20% faster for 8 s. Cooldown 60 s.', 'Восстанавливает 50% выносливости, +20% к скорости на 8 с. Перезарядка 60 с.', "Borrow the storm's legs.", 'Одолжи у бури её ноги.'),
       id: 'wanderer', name: { en: 'Wanderer', ru: 'Странник' },
       lore: { en: 'Wind at your heels, sky beneath your feet.', ru: 'Ветер за спиной, небо под ногами.' },
       masteries: [M('run', 'Run', 'Бег'), M('jump', 'Jump', 'Прыжок'), M('swim', 'Swim', 'Плавание'), M('dodge', 'Dodge', 'Уклонение'), M('ride', 'Riding', 'Верховая езда')],
@@ -82,6 +90,7 @@
       ],
     },
     {
+      ability: A('tirelesstoil', 'Tireless Toil', 'Неустанный труд', 'For 30 s chopping, mining, building and repairing cost no stamina. Cooldown 3 min.', '30 с рубка, добыча, строительство и ремонт не тратят выносливость. Перезарядка 3 мин.', 'Work until the work is done.', 'Работай, пока работа не сделана.'),
       id: 'artisan', name: { en: 'Artisan', ru: 'Ремесленник' },
       lore: { en: 'Hands that shape the world.', ru: 'Руки, что создают мир.' },
       masteries: [M('pickaxes', 'Pickaxes', 'Кирки'), M('woodcutting', 'Wood Cutting', 'Рубка древесины'), M('fishing', 'Fishing', 'Рыбалка'),
@@ -144,13 +153,13 @@
           <h3>${t(b.name)}</h3><p class="kind">${t(UI.branch)}</p><p class="lore">${t(b.lore)}</p><p class="hint">${t(UI.help)}</p>`;
         return;
       }
-      const isPerk = !!node.tier, isKey = node.tier === 4;
-      const kind = isKey ? t(UI.keystone) : isPerk ? UI.perk[LANG](node.tier) : t(UI.mastery);
+      const isPerk = !!node.tier || !!node.ability, isKey = node.tier === 4;
+      const kind = node.ability ? t(UI.ability) : isKey ? t(UI.keystone) : isPerk ? UI.perk[LANG](node.tier) : t(UI.mastery);
       const effect = isPerk ? t(node.effect) + (node.ranks > 1 ? ' ' + UI.ranks[LANG](node.ranks) : '') : UI.masteryEffect[LANG](t(node.name));
-      const extra = isKey ? t(UI.keystoneRule) : isPerk ? UI.unlock[LANG](node.tier * 3) : t(UI.rankGate);
+      const extra = node.ability ? t(UI.abilityRule) : isKey ? t(UI.keystoneRule) : isPerk ? UI.unlock[LANG](node.tier * 3) : t(UI.rankGate);
       card.innerHTML = `<div class="card-icon ${isPerk ? 'perk' : ''}"><img src="${ROOT}icons/${node.id}.svg" alt=""></div>
         <h3>${t(node.name)}</h3><p class="kind">${kind} · ${t(b.name)}</p>
-        ${isPerk && node.ranks < 2 ? '' : '<div class="pips">' + '<i></i>'.repeat(isPerk ? node.ranks : 5) + '</div>'}
+        ${isPerk && !(node.ranks > 1) ? '' : '<div class="pips">' + '<i></i>'.repeat(isPerk ? node.ranks : 5) + '</div>'}
         <p class="effect">${effect}</p>${isPerk ? `<p class="lore">${t(node.lore)}</p>` : ''}<p class="hint">${extra}</p>`;
     }
 
@@ -177,10 +186,10 @@
       const b = BRANCHES[current];
       const g = el('g', {}, svg);
       const ms = b.masteries;
-      const spacing = ms.length > 1 ? Math.min(150, 660 / (ms.length - 1)) : 0;
+      const spacing = ms.length > 1 ? Math.min(150, 600 / (ms.length - 1)) : 0;
       const roots = ms.map((_, i) => {
         const x = (i - (ms.length - 1) / 2) * spacing;
-        return [x, -200 + 45 * (x / 330) * (x / 330)];
+        return [x, -220 + 45 * (x / 330) * (x / 330)];
       });
       roots.forEach(([x, y]) => el('line', { x1: X(0), y1: Y(TRUNK_BASE), x2: X(x), y2: Y(y), class: 'root' }, g));
       el('line', { x1: X(0), y1: Y(TRUNK_BASE), x2: X(0), y2: Y(TRUNK_TOP), class: 'trunk' }, g);
@@ -188,13 +197,17 @@
       const pos = {};
       for (let tier = 1; tier <= 4; tier++) {
         const ps = b.perks.filter((p) => p.tier === tier), y = gateY(tier);
-        ps.forEach((p, i) => { pos[p.id] = tier === 4 ? [0, y + 46] : [(i ? 1 : -1) * (tier === 2 ? 255 : 130), y]; });
+        ps.forEach((p, i) => { pos[p.id] = tier === 4 ? [0, y + 46] : [(i ? 1 : -1) * (tier === 2 ? 245 : 130), y]; });
         ps.forEach((p) => el('line', { x1: X(0), y1: Y(y), x2: X(pos[p.id][0]), y2: Y(pos[p.id][1]), class: 'branchline' }, g));
         el('rect', { x: X(-13), y: Y(y) - 3, width: 26, height: 6, class: 'gate' }, g);
         const lbl = el('text', { x: X(tier === 4 ? 30 : -26), y: Y(y + (tier === 4 ? -14 : 14)) + 5, class: 'gate-label' }, g);
         lbl.textContent = need(tier);
       }
-      ms.forEach((m, i) => node(g, m, roots[i][0], roots[i][1], 62, false));
+      // The active ability grows outward from the tier 1 perks.
+      const firstPerk = b.perks.find((p) => p.tier === 1), ab = [-322, gateY(1)];
+      el('line', { x1: X(pos[firstPerk.id][0]), y1: Y(pos[firstPerk.id][1]), x2: X(ab[0]), y2: Y(ab[1]), class: 'root' }, g);
+      node(g, b.ability, ab[0], ab[1], 56, true);
+      ms.forEach((m, i) => node(g, m, roots[i][0], roots[i][1], 60, false));
       b.perks.forEach((p) => node(g, p, pos[p.id][0], pos[p.id][1], p.tier === 4 ? 78 : 64, true));
       showCard(null);
     }

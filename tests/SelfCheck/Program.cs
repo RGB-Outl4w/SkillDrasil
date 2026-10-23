@@ -99,7 +99,14 @@ static class Program
 
         // Multi-rank perks keep ranks through a save round trip.
         Check(gate.Spend("ironhide") && gate.Spend("ironhide") && TreeState.Parse(gate.Serialize()).Rank("ironhide") == 2, "multi-rank perk");
-        Check(TreeDef.Nodes.Length == 59 && TreeDef.Nodes.Count(n => n.IsKeystone) == 5, "node count");
+        Check(TreeDef.Nodes.Length == 64 && TreeDef.Nodes.Count(n => n.IsKeystone) == 5 && TreeDef.Nodes.Count(n => n.IsAbility) == 5, "node count");
+
+        // Abilities: one per branch, locked until a tier 1 perk of that branch is learned.
+        var ab = new TreeState { FreeEarned = 100 };
+        ab.Spend("swords"); ab.Spend("axes"); ab.Spend("clubs");
+        Check(ab.CanSpend("warcry") == Block.NeedPerk, "ability needs a tier 1 perk");
+        Check(ab.Spend("ironhide") && ab.Spend("warcry"), "ability learnable after tier 1 perk");
+        Check(ab.CanSpend("huntersmark") == Block.NeedSpent, "other branch's ability still gated");
 
 
         // Update check version compare.

@@ -31,10 +31,12 @@ focusedmind
 frame_mastery
 frame_perk
 galdr
+galestep
 ghost
 hardworker
 hearthkeeper
 homesteader
+huntersmark
 ironhide
 item_rune
 jump
@@ -65,9 +67,12 @@ springstep
 steadyaim
 swim
 swords
+tirelesstoil
 unarmed
 unshaken
 vigor
+volvaschant
 volvasoath
+warcry
 windrunner
 woodcutting

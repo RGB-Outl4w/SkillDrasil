@@ -6,7 +6,7 @@
 <title>SkillDrasil – древо навыков для Valheim</title>
 <meta name="description" content="SkillDrasil заменяет систему навыков Valheim древом из пяти ветвей: получайте очки, играя, выбирайте мастерство и перки и не теряйте свой выбор после смерти.">
 <meta property="og:title" content="SkillDrasil – древо навыков для Valheim">
-<meta property="og:description" content="Пять ветвей, 24 мастерства, 30 перков, 5 краеугольных камней. Ваши деяния питают корни, ваш выбор растит ветви.">
+<meta property="og:description" content="Пять ветвей, 24 мастерства, 30 перков, 5 краеугольных камней, 5 активных способностей. Ваши деяния питают корни, ваш выбор растит ветви.">
 <link rel="icon" href="../icons/rune.svg" type="image/svg+xml">
 <link rel="alternate" hreflang="en" href="../">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,6 +76,7 @@
       <div class="feature"><img src="../icons/riposte.svg" alt=""><h3>Перки</h3><p>По два на уровень, открываются при 3, 6 и 9 потраченных очках, у некоторых несколько рангов: Берсеркганг, Тихая смерть, Рунный оберег, Лёгкое падение и другие.</p></div>
       <div class="feature"><img src="../icons/bearshirt.svg" alt=""><h3>Краеугольные камни</h3><p>При 15 очках ветвь предлагает краеугольный камень: сильный бонус с настоящим недостатком, например <em>Медвежья рубаха</em> (+30% в ближнем бою, −40% брони). Только один на всё древо — решите, кто вы.</p></div>
       <div class="feature"><img src="../icons/branch_wanderer.svg" alt=""><h3>Свободные очки</h3><p>Каждый побеждённый в вашем мире босс и каждый новый открытый биом дают свободное очко для любой ветви.</p></div>
+      <div class="feature"><img src="../icons/warcry.svg" alt=""><h3>Способности</h3><p>У каждой ветви есть активная способность, она открывается после перка 1-го уровня: Боевой клич, Метка охотника, Песнь вёльвы, Шаг бури, Неустанный труд. Применение: <strong>Alt + 1–5</strong>; перезарядка видна на экране.</p></div>
       <div class="feature"><img src="../icons/se_severed.svg" alt=""><h3>Смерть</h3><p>Вы теряете часть ещё не превращённого в очки опыта ветвей, но не сами очки. После возрождения 10 минут действуют <em>Подрубленные корни</em>: мастерство на ранг ниже, перки 3-го уровня и камень молчат.</p></div>
       <div class="feature"><img src="../icons/item_rune.svg" alt=""><h3>Сброс</h3><p>Создайте <em>Руну забвения</em> на верстаке (10 × Камень, 10 × Смола, 5 × Глаз грейдворфа) и используйте её, чтобы вернуть все очки.</p></div>
     </div>
@@ -85,13 +86,13 @@
     <div class="two">
       <div class="panel">
         <h3>Долгая сага, а не один вечер</h3>
-        <p>Очко номер <em>n</em> в ветви стоит <code>80 × n<sup>1.5</sup></code> опыта. Первые очки приходят за минуты, а чтобы заполнить ветвь, понадобится целое прохождение.</p>
+        <p>Очко номер <em>n</em> в ветви стоит <code>60 × n<sup>1.25</sup></code> опыта. Первые очки приходят за минуты, а хорошо развитая ветвь потребует многих вечеров, а не одного.</p>
         <div class="table-scroll"><table>
           <tr><th>Очко</th><th>Цена</th><th>Всего</th></tr>
-          <tr><td>1-е</td><td>80</td><td>80</td></tr>
-          <tr><td>5-е</td><td>~900</td><td>~2 200</td></tr>
-          <tr><td>10-е</td><td>~2 500</td><td>~10 000</td></tr>
-          <tr><td>20-е</td><td>~7 200</td><td>~57 000</td></tr>
+          <tr><td>1-е</td><td>60</td><td>60</td></tr>
+          <tr><td>5-е</td><td>~450</td><td>~1 200</td></tr>
+          <tr><td>10-е</td><td>~1 070</td><td>~5 300</td></tr>
+          <tr><td>20-е</td><td>~2 540</td><td>~24 000</td></tr>
         </table></div>
       </div>
       <div class="panel">
@@ -131,11 +132,12 @@
         <p><code>BepInEx/config/rgboutl4w.skilldrasil.cfg</code></p>
         <div class="table-scroll"><table>
           <tr><th>Ключ</th><th>По умолч.</th><th></th></tr>
-          <tr><td><code>FirstPointXp</code></td><td>80</td><td>Опыт за первое очко ветви (сервер)</td></tr>
-          <tr><td><code>CostExponent</code></td><td>1.5</td><td>Насколько быстро дорожают очки (сервер)</td></tr>
+          <tr><td><code>FirstPointXp</code></td><td>60</td><td>Опыт за первое очко ветви (сервер)</td></tr>
+          <tr><td><code>CostExponent</code></td><td>1.25</td><td>Насколько быстро дорожают очки (сервер)</td></tr>
           <tr><td><code>SeveredRootsSeconds</code></td><td>600</td><td>Длительность дебаффа после смерти (сервер)</td></tr>
           <tr><td><code>PerkStrength</code></td><td>1</td><td>Сила всех бонусов перков, 0–3 (сервер)</td></tr>
           <tr><td><code>OpenTreeKey</code></td><td>K</td><td>Открывает древо</td></tr>
+          <tr><td><code>Modifier</code>, <code>KeyWarrior</code>…</td><td>Alt, 1–5</td><td>Клавиши способностей</td></tr>
           <tr><td><code>ShowPointsHint</code></td><td>true</td><td>Подсказка на экране, пока есть нераспределённые очки</td></tr>
           <tr><td><code>CheckForUpdates</code></td><td>true</td><td>Уведомление в главном меню о новой версии</td></tr>
         </table></div>

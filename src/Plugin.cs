@@ -20,13 +20,15 @@ namespace SkillDrasil
     {
         public const string Guid = "rgboutl4w.skilldrasil";
         public const string ModName = "SkillDrasil";
-        public const string Version = "0.3.1";
+        public const string Version = "0.3.2";
         const string ReleasesApi = "https://api.github.com/repos/RGB-Outl4w/SkillDrasil/releases/latest";
         const string ReleasesPage = "https://github.com/RGB-Outl4w/SkillDrasil/releases/latest";
 
         public static ConfigEntry<float> FirstPointXp, CostExponent, SeveredSeconds, PerkStrength;
         public static ConfigEntry<KeyCode> OpenKey;
         public static ConfigEntry<bool> ShowPointsHint;
+        public static ConfigEntry<KeyCode> AbilityModifier;
+        public static readonly ConfigEntry<KeyCode>[] AbilityKeys = new ConfigEntry<KeyCode>[5];
         static ConfigEntry<bool> checkForUpdates;
         static string latestRelease;
 
@@ -35,17 +37,28 @@ namespace SkillDrasil
         void Awake()
         {
             Log = Logger;
-            FirstPointXp = Config.BindConfig("Progression", "FirstPointXp", 80f, "Branch XP for the first point. Point n costs FirstPointXp * n^CostExponent.", synced: true);
-            CostExponent = Config.BindConfig("Progression", "CostExponent", 1.5f, "How steeply point cost grows. 1 = linear, 1.5 = vanilla-like.", synced: true);
+            FirstPointXp = Config.BindConfig("Progression", "FirstPointXp", 60f, "Branch XP for the first point. Point n costs FirstPointXp * n^CostExponent.", synced: true);
+            CostExponent = Config.BindConfig("Progression", "CostExponent", 1.25f, "How steeply point cost grows. 1 = linear, 1.5 = vanilla-like (slow).", synced: true);
+            // 0.3.2 lowered the defaults from 80 / 1.5. Config files still holding the old defaults move to the new ones;
+            // any other value was chosen on purpose and is kept.
+            if (FirstPointXp.Value == 80f && CostExponent.Value == 1.5f)
+            {
+                FirstPointXp.Value = (float)FirstPointXp.DefaultValue;
+                CostExponent.Value = (float)CostExponent.DefaultValue;
+            }
             SeveredSeconds = Config.BindConfig("Balance", "SeveredRootsSeconds", 600f, "Duration of the Severed Roots debuff after death.", synced: true);
             PerkStrength = Config.BindConfig("Balance", "PerkStrength", 1f, "Scales every perk and keystone bonus (drawbacks stay fixed). 0.5 = half as strong, 2 = twice.", synced: true,
                 acceptableValues: new AcceptableValueRange<float>(0f, 3f));
             ShowPointsHint = Config.BindConfig("Client", "ShowPointsHint", true, "Show a HUD hint while you have unspent points.", synced: false);
+            AbilityModifier = Config.BindConfig("Abilities", "Modifier", KeyCode.LeftAlt, "Hold this and press an ability key to cast. While held, number keys don't use the hotbar.", synced: false);
+            for (int b = 0; b < 5; b++)
+                AbilityKeys[b] = Config.BindConfig("Abilities", "Key" + TreeDef.BranchNames[b].Replace("ð", "d"), KeyCode.Alpha1 + b, $"Ability key for the {TreeDef.BranchNames[b]} branch.", synced: false);
             OpenKey = Config.BindConfig("Client", "OpenTreeKey", KeyCode.K, "Key that opens the skill tree.", synced: false);
             checkForUpdates = Config.BindConfig("Client", "CheckForUpdates", true, "Check GitHub for a newer release on the main menu.", synced: false);
 
             L.Register();
             Perks.Register();
+            Abilities.Register();
             CommandManager.Instance.AddConsoleCommand(new PointsCommand());
             new Harmony(Guid).PatchAll();
 
@@ -56,7 +69,11 @@ namespace SkillDrasil
             }
         }
 
-        void Update() => TreeUI.Tick();
+        void Update()
+        {
+            TreeUI.Tick();
+            Abilities.Tick();
+        }
 
         IEnumerator CheckForUpdate()
         {

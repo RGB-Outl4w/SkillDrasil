@@ -289,14 +289,15 @@ namespace SkillDrasil
         {
             var c = canvas.transform;
             var masteries = TreeDef.Nodes.Where(n => n.Branch == b && n.IsMastery).ToArray();
-            var perks = TreeDef.Nodes.Where(n => n.Branch == b && !n.IsMastery).OrderBy(n => n.Tier).ToArray();
+            var perks = TreeDef.Nodes.Where(n => n.Branch == b && !n.IsMastery && !n.IsAbility).OrderBy(n => n.Tier).ToArray();
+            var ability = TreeDef.Nodes.First(n => n.Branch == b && n.IsAbility);
 
             // Root positions: a shallow arc under the trunk, outer roots a little higher.
-            float spacing = masteries.Length > 1 ? Mathf.Min(150f, 660f / (masteries.Length - 1)) : 0f;
+            float spacing = masteries.Length > 1 ? Mathf.Min(150f, 600f / (masteries.Length - 1)) : 0f;
             var rootPos = masteries.Select((n, i) =>
             {
                 float x = (i - (masteries.Length - 1) / 2f) * spacing;
-                return new Vector2(x, -200f + 45f * (x / 330f) * (x / 330f));
+                return new Vector2(x, -220f + 45f * (x / 330f) * (x / 330f));
             }).ToArray();
             var basePoint = new Vector2(0f, TrunkBase);
             for (int i = 0; i < masteries.Length; i++)
@@ -320,7 +321,7 @@ namespace SkillDrasil
                 }
                 else
                 {
-                    float x = n0.Tier == 2 ? 255f : 130f;
+                    float x = n0.Tier == 2 ? 245f : 130f;
                     int side = -1;
                     foreach (var n in tier)
                     {
@@ -333,7 +334,12 @@ namespace SkillDrasil
                 Label(c, $"{n0.RequiredSpent(1)}", gate + new Vector2(n0.IsKeystone ? 30f : -26f, n0.IsKeystone ? -14f : 14f), 40f, 22f, 15, Pale);
             }
 
-            for (int i = 0; i < masteries.Length; i++) views[masteries[i].Id] = BuildNode(c, masteries[i], rootPos[i], 62f);
+            // The active ability grows outward from the tier 1 perks: it needs one of them learned.
+            var abilityPos = new Vector2(-322f, GateY(3));
+            Line(c, perkPos[perks.First(n => n.Tier == 1).Id], abilityPos, 6f, Bark);
+            views[ability.Id] = BuildNode(c, ability, abilityPos, 56f);
+
+            for (int i = 0; i < masteries.Length; i++) views[masteries[i].Id] = BuildNode(c, masteries[i], rootPos[i], 60f);
             foreach (var n in perks) views[n.Id] = BuildNode(c, n, perkPos[n.Id], n.IsKeystone ? 78f : 64f);
         }
 
@@ -462,6 +468,7 @@ namespace SkillDrasil
             cardName.text = L.Name(n);
             cardKind.text = n.IsMastery ? L.T("kind_mastery", L.Branch(tab))
                 : n.IsKeystone ? L.T("kind_keystone", L.Branch(tab))
+                : n.IsAbility ? L.T("kind_ability", L.Branch(tab))
                 : L.T("kind_perk", n.Tier, L.Branch(tab));
             for (int i = 0; i < cardPips.Length; i++) cardPips[i].enabled = n.MaxRank > 1 && i < n.MaxRank;
             SetPips(cardPips, rank);
@@ -476,6 +483,7 @@ namespace SkillDrasil
                     : L.T("level_next", effective * TreeDef.LevelsPerRank, (effective + 1) * TreeDef.LevelsPerRank, rank + 1);
             }
             else if (rank == 0) cardNow.text = L.T("not_learned");
+            else if (n.IsAbility) cardNow.text = L.T("ability_key", Abilities.KeyLabel(n.Branch));
             else if (n.Tier >= 3 && severed) cardNow.text = L.T("learned_inactive");
             else cardNow.text = n.MaxRank > 1 ? L.T("rank_of", rank, n.MaxRank) : L.T("learned");
 

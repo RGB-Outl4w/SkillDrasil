@@ -14,15 +14,16 @@ namespace SkillDrasil
         public readonly string Name;
         public readonly Branch Branch;
         public readonly int Skill;   // Skills.SkillType value for masteries, 0 for perks
-        public readonly int Tier;    // perks only: 1..3, 4 = keystone
+        public readonly int Tier;    // perks only: 1..3, 4 = keystone; 0 for masteries and abilities
+        public readonly bool IsAbility; // active ability: hotkey + cooldown, needs a tier 1 perk of its branch
         readonly int perkRanks;
         public readonly string Effect;
         public readonly string Icon; // perks: item prefab whose icon is shown
         public readonly string Lore;
 
-        public Node(string id, string name, Branch branch, int skill, int tier, string effect, string icon = null, string lore = null, int ranks = 1)
+        public Node(string id, string name, Branch branch, int skill, int tier, string effect, string icon = null, string lore = null, int ranks = 1, bool ability = false)
         {
-            Id = id; Name = name; Branch = branch; Skill = skill; Tier = tier; Effect = effect; Icon = icon; Lore = lore; perkRanks = ranks;
+            Id = id; Name = name; Branch = branch; Skill = skill; Tier = tier; Effect = effect; Icon = icon; Lore = lore; perkRanks = ranks; IsAbility = ability;
         }
 
         public const int KeystoneTier = 4, KeystoneSpent = 15;
@@ -32,7 +33,7 @@ namespace SkillDrasil
         public int MaxRank => IsMastery ? 5 : perkRanks;
 
         // Points that must already be spent in this branch before buying rank `nextRank`.
-        public int RequiredSpent(int nextRank) => IsMastery ? (nextRank - 1) * 2 : IsKeystone ? KeystoneSpent : Tier * 3;
+        public int RequiredSpent(int nextRank) => IsMastery ? (nextRank - 1) * 2 : IsKeystone ? KeystoneSpent : IsAbility ? 3 : Tier * 3;
     }
 
     public static class TreeDef
@@ -56,6 +57,8 @@ namespace SkillDrasil
             new Node(id, name, b, 0, tier, effect, icon, lore, ranks);
         static Node K(string id, string name, Branch b, string effect, string lore) =>
             new Node(id, name, b, 0, Node.KeystoneTier, effect, null, lore);
+        static Node A(string id, string name, Branch b, string effect, string lore) =>
+            new Node(id, name, b, 0, 0, effect, null, lore, ability: true);
 
         public static readonly Node[] Nodes =
         {
@@ -68,6 +71,7 @@ namespace SkillDrasil
             P("ironhide", "Iron Hide", Branch.Warrior, 1, "+3 armor per rank.", null, "Scars are a second coat of mail.", 3),
             P("battlefervor", "Battle Fervor", Branch.Warrior, 2, "Melee attacks cost 10% less stamina per rank.", null, "The fight feeds itself.", 2),
             P("unshaken", "Unshaken", Branch.Warrior, 3, "Take 40% less stagger.", null, "Roots run deep. The oak does not fall."),
+            A("warcry", "War Cry", Branch.Warrior, "You and allies within 15 m deal 20% more damage for 15 s.\nCooldown 2 min.", "One voice, and the line holds."),
             K("bearshirt", "Bear Shirt", Branch.Warrior, "+30% melee damage.\nDrawback: 40% less armor.", "Shed the mail. Become the bear."),
 
             M("Bows", Branch.Hunter, 8), M("Crossbows", Branch.Hunter, 14), M("Knives", Branch.Hunter, 2),
@@ -78,6 +82,7 @@ namespace SkillDrasil
             P("shadowstep", "Shadowstep", Branch.Hunter, 1, "Sneaking costs 20% less stamina per rank.", null, "Move as the mist moves.", 2),
             P("keeneye", "Keen Eye", Branch.Hunter, 2, "+5% bow and crossbow damage per rank.", null, "The hawk's eye misses nothing.", 3),
             P("ghost", "Ghost", Branch.Hunter, 3, "50% harder to notice while sneaking.", null, "Here, then gone."),
+            A("huntersmark", "Hunter's Mark", Branch.Hunter, "Enemies within 25 m take 25% more damage from everyone for 15 s.\nCooldown 90 s.", "Point, and the pack follows."),
             K("lonewolf", "Lone Wolf", Branch.Hunter, "+30% bow, crossbow and knife damage.\nDrawback: other melee weapons deal 30% less.", "No shield-brothers. No mercy."),
 
             M("Elemental Magic", Branch.Seidr, 9), M("Blood Magic", Branch.Seidr, 10),
@@ -87,6 +92,7 @@ namespace SkillDrasil
             P("vigor", "Völva's Vigor", Branch.Seidr, 1, "+15% health regeneration per rank.", null, "The seeress outlives the warrior.", 2),
             P("galdr", "Galdr", Branch.Seidr, 2, "+5% elemental and blood magic damage per rank.", null, "Sing the runes and they answer.", 3),
             P("runeward", "Rune Ward", Branch.Seidr, 3, "Resistant to fire, frost and lightning.", null, "Carved on the skin, the runes hold back the storm."),
+            A("volvaschant", "Völva's Chant", Branch.Seidr, "Costs 30 eitr. You and allies within 15 m regain 40% health over 10 s.\nCooldown 2 min.", "The old songs mend what steel has torn."),
             K("volvasoath", "Völva's Oath", Branch.Seidr, "+30% magic damage, +25% eitr regeneration.\nDrawback: weapons deal 30% less.", "Lay down the blade. Take up the staff for good."),
 
             M("Run", Branch.Wanderer, 102), M("Jump", Branch.Wanderer, 100), M("Swim", Branch.Wanderer, 103),
@@ -97,6 +103,7 @@ namespace SkillDrasil
             P("sealborn", "Seal-Born", Branch.Wanderer, 1, "Swimming costs 20% less stamina per rank.", null, "The fjord is just another road.", 2),
             P("springstep", "Spring Step", Branch.Wanderer, 2, "Jumping costs 10% less stamina per rank.", null, "Leap the stream. Leap the wall.", 3),
             P("windrunner", "Windrunner", Branch.Wanderer, 3, "+8% movement speed.", null, "Outrun the storm."),
+            A("galestep", "Gale Step", Branch.Wanderer, "Restore 50% stamina and move 20% faster for 8 s.\nCooldown 60 s.", "Borrow the storm's legs."),
             K("endlessroad", "Endless Road", Branch.Wanderer, "+40% stamina regeneration.\nDrawback: -100 carry weight.", "Travel light. Travel forever."),
 
             M("Pickaxes", Branch.Artisan, 12), M("Wood Cutting", Branch.Artisan, 13), M("Fishing", Branch.Artisan, 104),
@@ -107,6 +114,7 @@ namespace SkillDrasil
             P("quickstudy", "Quick Study", Branch.Artisan, 1, "+5% XP for every branch per rank.", null, "Every task teaches the willing.", 3),
             P("minersgrit", "Miner's Grit", Branch.Artisan, 2, "Pickaxe swings cost 15% less stamina per rank.", null, "The mountain yields to the patient.", 2),
             P("hardworker", "Hard Worker", Branch.Artisan, 3, "+15% stamina regeneration.", null, "Rest is for the dead."),
+            A("tirelesstoil", "Tireless Toil", Branch.Artisan, "For 30 s chopping, mining, building and repairing cost no stamina.\nCooldown 3 min.", "Work until the work is done."),
             K("homesteader", "Homesteader", Branch.Artisan, "+100 carry weight, +25% XP for every branch.\nDrawback: you take 25% more damage.", "Build the hall. Let others hold the shield wall."),
         };
 
@@ -122,7 +130,7 @@ namespace SkillDrasil
         };
     }
 
-    public enum Block { None, Maxed, NeedSpent, KeystoneTaken, NoPoints }
+    public enum Block { None, Maxed, NeedSpent, NeedPerk, KeystoneTaken, NoPoints }
 
     public sealed class TreeState
     {
@@ -182,6 +190,7 @@ namespace SkillDrasil
             need = n.RequiredSpent(rank + 1);
             if (rank >= n.MaxRank) return Block.Maxed;
             if (Spent(n.Branch) < need) return Block.NeedSpent;
+            if (n.IsAbility && !TreeDef.Nodes.Any(p => p.Branch == n.Branch && p.Tier == 1 && Rank(p.Id) > 0)) return Block.NeedPerk;
             if (n.IsKeystone && rank == 0 && Keystone != null) return Block.KeystoneTaken;
             if (BranchAvailable(n.Branch) == 0 && FreeAvailable <= 0) return Block.NoPoints;
             return Block.None;

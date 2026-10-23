@@ -18,6 +18,11 @@ namespace SkillDrasil
             ["kind_mastery"] = "Mastery  ·  {0}",
             ["kind_perk"] = "Tier {0} perk  ·  {1}",
             ["kind_keystone"] = "Keystone  ·  {0}",
+            ["kind_ability"] = "Active ability  ·  {0}",
+            ["ability_key"] = "Learned. Cast with {0}",
+            ["ability_cooldown"] = "{0} is ready in {1} s",
+            ["ability_no_targets"] = "No enemies nearby",
+            ["block_perk"] = "Learn a tier 1 perk of this branch first",
             ["hud_points"] = "SkillDrasil: {0} points to spend  [{1}]",
             ["tip_learn"] = "Click, then Learn  ({0} → {1})",
             ["tip_maxed"] = "Fully learned",
@@ -65,6 +70,27 @@ namespace SkillDrasil
             ["kind_mastery"] = "Мастерство  ·  {0}",
             ["kind_perk"] = "Перк {0}-го уровня  ·  {1}",
             ["kind_keystone"] = "Краеугольный камень  ·  {0}",
+            ["kind_ability"] = "Активная способность  ·  {0}",
+            ["ability_key"] = "Изучено. Применение: {0}",
+            ["ability_cooldown"] = "«{0}» будет готово через {1} с",
+            ["ability_no_targets"] = "Рядом нет врагов",
+            ["block_perk"] = "Сначала изучите перк 1-го уровня этой ветви",
+
+            ["name_warcry"] = "Боевой клич",
+            ["effect_warcry"] = "Вы и союзники в радиусе 15 м наносите на 20% больше урона 15 с.\nПерезарядка 2 мин.",
+            ["lore_warcry"] = "Один голос — и строй устоит.",
+            ["name_huntersmark"] = "Метка охотника",
+            ["effect_huntersmark"] = "Враги в радиусе 25 м получают на 25% больше урона от всех 15 с.\nПерезарядка 90 с.",
+            ["lore_huntersmark"] = "Укажи — и стая последует.",
+            ["name_volvaschant"] = "Песнь вёльвы",
+            ["effect_volvaschant"] = "Стоит 30 эйтра. Вы и союзники в радиусе 15 м восстанавливаете 40% здоровья за 10 с.\nПерезарядка 2 мин.",
+            ["lore_volvaschant"] = "Старые песни лечат то, что порвала сталь.",
+            ["name_galestep"] = "Шаг бури",
+            ["effect_galestep"] = "Восстанавливает 50% выносливости, +20% к скорости на 8 с.\nПерезарядка 60 с.",
+            ["lore_galestep"] = "Одолжи у бури её ноги.",
+            ["name_tirelesstoil"] = "Неустанный труд",
+            ["effect_tirelesstoil"] = "30 с рубка, добыча, строительство и ремонт не тратят выносливость.\nПерезарядка 3 мин.",
+            ["lore_tirelesstoil"] = "Работай, пока работа не сделана.",
             ["hud_points"] = "SkillDrasil: очков к распределению: {0}  [{1}]",
             ["tip_learn"] = "Нажмите, затем «Изучить»  ({0} → {1})",
             ["tip_maxed"] = "Изучено полностью",
@@ -275,6 +301,7 @@ namespace SkillDrasil
         public static string Reason(Block block, int need, Branch b) =>
             block == Block.Maxed ? T("block_maxed")
             : block == Block.NeedSpent ? T("block_need", need, Branch(b))
+            : block == Block.NeedPerk ? T("block_perk")
             : block == Block.KeystoneTaken ? T("block_keystone")
             : block == Block.NoPoints ? T("block_none")
             : T("ready");

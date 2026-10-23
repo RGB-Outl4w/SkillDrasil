@@ -118,6 +118,20 @@ ICONS = {
                     '<rect x="44" y="46" width="14" height="9" rx="4"/></g>'
                     '<path d="M14 42 L24 36 M50 42 L40 36" stroke-width="3"/>',
     # Branch tabs
+    # 0.3.2 active abilities
+    'warcry': f'<path d="M8 40 C8 28 18 22 30 26 L44 14 V52 L30 40 C22 44 8 50 8 40 Z" {F}/>'
+              '<path d="M50 22 C54 26 54 38 50 42 M56 16 C62 24 62 40 56 48" stroke-width="3"/>',
+    'huntersmark': '<circle cx="34" cy="34" r="20" stroke-width="3"/><circle cx="34" cy="34" r="9" stroke-width="3"/>'
+                   '<path d="M26 26 L42 42 M42 26 L26 42" stroke-width="4"/>'
+                   '<path d="M34 4 V12 M34 56 V64 M4 34 H12 M56 34 H64" stroke-width="3"/>',
+    'volvaschant': f'<path d="M32 58 V24" stroke-width="4"/><circle cx="32" cy="16" r="7" {F}/>'
+                   '<path d="M18 10 C12 18 12 30 18 38 M46 10 C52 18 52 30 46 38" stroke-width="3"/>'
+                   '<path d="M10 4 C2 16 2 32 10 44 M54 4 C62 16 62 32 54 44" stroke-width="2" opacity="0.6"/>',
+    'galestep': f'<path d="M30 12 H42 V34 L58 40 V50 H28 Z" {F}/>'
+                '<path d="M4 22 H20 M8 32 H22 M2 42 H22 M10 52 H24" stroke-width="3"/>',
+    'tirelesstoil': '<path d="M10 44 L38 16" stroke-width="4.5"/><rect x="32" y="4" width="18" height="11" rx="2" transform="rotate(45 41 9)" fill="#fff" stroke="none"/>'
+                    '<path d="M54 44 L28 18" stroke-width="4"/><path d="M18 22 Q30 8 44 14" stroke-width="4.5"/>'
+                    '<path d="M18 54 C18 48 24 46 32 54 C40 62 46 60 46 54 C46 48 40 46 32 54 C24 62 18 60 18 54 Z" stroke-width="2.5"/>',
     # 0.3 perks
     'ironhide': '<path d="M18 10 L32 6 L46 10 L54 22 L48 26 V56 H16 V26 L10 22 Z"/>'
                 '<path d="M22 30 H42 M22 38 H42 M22 46 H42" stroke-width="2.5" stroke-dasharray="3 3"/>',
